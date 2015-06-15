@@ -71,9 +71,9 @@
  *
  *  @ingroup Reducers
  *
- *  You should be familiar with @ref pagereducers "Cilk reducers", described in
- *  file `reducers.md`, and particularly with @ref reducers_using, before trying
- *  to use the information in this file.
+ *  You should be familiar with @ref pagereducers "Intel(R) Cilk(TM) Plus reducers",
+ *  described in file `reducers.md`, and particularly with @ref reducers_using,
+ *  before trying to use the information in this file.
  *
  *  @section redminmax_usage Usage Examples
  *
@@ -359,14 +359,14 @@
  *
  *  @section redminmax_compatibility Binary Compatibility Issues
  *
- *  Most Cilk library reducers provide binary compatibility between
- *  `reducer_KIND` reducers compiled with Cilk library version 0.9 (distributed
- *  with Intel® C++ Composer XE version 13.0 and earlier) and the same reducers
- *  compiled with Cilk library version 1.0 and later.
+ *  Most Intel Cilk Plus library reducers provide binary compatibility between
+ *  `reducer_KIND` reducers compiled with Intel Cilk Plus library version 0.9
+ *  (distributed with Intel® C++ Composer XE version 13.0 and earlier) and the 
+ *  ame reducers compiled with Intel Cilk Plus library version 1.0 and later.
  *
  *  Because of implementation changes that were needed to allow vectorization
  *  of loops containing min/max reducers, this binary compatibility is _not_
- *  generally available for min/max reducers, either between Cilk library
+ *  generally available for min/max reducers, either between Intel Cilk Plus library
  *  versions 0.9 and 1.0, or between versions 1.0 and 1.1. (Code compiled with
  *  different versions can be linked together safely, but min/max reducers in
  *  different library versions are in different namespaces, so reducer objects
@@ -528,8 +528,8 @@ using ::cilk::internal::class_is_empty;
  *  -   identity_value gets the appropriate identity value for a type.
  *
  *  The is_set optimization is the reason that min/max reducers compiled with
- *  Cilk library 1.0 are binary-incompatible with the same reducers compiled
- *  with library 0.9, and therefore the optimization is suppressed when
+ *  Intel Cilk Plus library 1.0 are binary-incompatible with the same reducers
+ *  compiled with library 0.9, and therefore the optimization is suppressed when
  *  compiling in
  *  ReducersMinMaxBinComp "binary compatibility mode".
  *
@@ -703,7 +703,7 @@ public:
  *      in the monoid, and just call it from the views.
  *  2.  In ReducersMinMaxBinComp "binary compatibility mode", views for
  *      reducers with a stateless comparator must have the same content as in
- *      Cilk library 0.9 - that is, they must contain only `value` and
+ *      Intel Cilk Plus library 0.9 - that is, they must contain only `value` and
  *      `is_set` data members.
  *
  *  To achieve the first objective, we use the
@@ -771,11 +771,12 @@ protected:
  *          customized to consider only the value component of the (index,
  *          value) `Type` pair. Unfortunately, this would break binary
  *          compatibility with reducer_max_index and reducer_min_index in
- *          Cilk library 0.9, because the memory layout of an (index, value)
- *          pair followed by a `bool` is different from the memory layout of an
- *          index data member followed by a value data member followed by a
- *          `bool` data member. The content class is designed to exactly
- *          replicate the layout of the views in library 0.9 reducers.
+ *          Intel Cilk Plus library 0.9, because the memory layout of an
+ *          (index, value) pair followed by a `bool` is different from the
+ *          memory layout of an index data member followed by a value data
+ *          member followed by a `bool` data member. The content class is
+ *          designed to exactly replicate the layout of the views in library 0.9
+ *          reducers.
  *
  *  A content class `C`, and its objects `c`, must define the following:
  *
@@ -2472,10 +2473,10 @@ public:
     //@}
 
     /** @name Upcast
-     *  @details In Cilk library 0.9, reducers were always cache-aligned. In
-     *  library  1.0, reducer cache alignment is optional. By default, reducers
-     *  are unaligned (i.e., just naturally aligned), but legacy wrappers
-     *  inherit from cache-aligned reducers for binary compatibility.
+     *  @details In Intel Cilk Plus library 0.9, reducers were always cache-aligned.
+     *  In library 1.0, reducer cache alignment is optional. By default,
+     *  reducers are unaligned (i.e., just naturally aligned), but legacy
+     *  wrappers inherit from cache-aligned reducers for binary compatibility.
      *
      *  This means that a wrapper will automatically be upcast to its aligned
      *  reducer base class. The following conversion operators provide
@@ -2672,10 +2673,10 @@ public:
     //@}
 
     /** @name Upcast
-     *  @details In Cilk library 0.9, reducers were always cache-aligned. In
-     *  library  1.0, reducer cache alignment is optional. By default, reducers
-     *  are unaligned (i.e., just naturally aligned), but legacy wrappers
-     *  inherit from cache-aligned reducers for binary compatibility.
+     *  @details In Intel Cilk Plus library 0.9, reducers were always cache-aligned.
+     *  In library 1.0, reducer cache alignment is optional. By default,
+     *  reducers are unaligned (i.e., just naturally aligned), but legacy
+     *  wrappers inherit from cache-aligned reducers for binary compatibility.
      *
      *  This means that a wrapper will automatically be upcast to its aligned
      *  reducer base class. The following conversion operators provide
@@ -2887,10 +2888,10 @@ public:
     //@}
 
     /** @name Upcast
-     *  @details In Cilk library 0.9, reducers were always cache-aligned. In
-     *  library  1.0, reducer cache alignment is optional. By default, reducers
-     *  are unaligned (i.e., just naturally aligned), but legacy wrappers
-     *  inherit from cache-aligned reducers for binary compatibility.
+     *  @details In Intel Cilk Plus library 0.9, reducers were always cache-aligned.
+     *  In library 1.0, reducer cache alignment is optional. By default,
+     *  reducers are unaligned (i.e., just naturally aligned), but legacy
+     *  wrappers inherit from cache-aligned reducers for binary compatibility.
      *
      *  This means that a wrapper will automatically be upcast to its aligned
      *  reducer base class. The following conversion operators provide
@@ -3073,10 +3074,10 @@ public:
     //@}
 
     /** @name Upcast
-     *  @details In Cilk library 0.9, reducers were always cache-aligned. In
-     *  library  1.0, reducer cache alignment is optional. By default, reducers
-     *  are unaligned (i.e., just naturally aligned), but legacy wrappers
-     *  inherit from cache-aligned reducers for binary compatibility.
+     *  @details In Intel Cilk Plus library 0.9, reducers were always cache-aligned.
+     *  In library 1.0, reducer cache alignment is optional. By default,
+     *  reducers are unaligned (i.e., just naturally aligned), but legacy
+     *  wrappers inherit from cache-aligned reducers for binary compatibility.
      *
      *  This means that a wrapper will automatically be upcast to its aligned
      *  reducer base class. The following conversion operators provide

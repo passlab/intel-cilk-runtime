@@ -43,14 +43,14 @@
         for your assistance in helping us improve Cilk Plus.
 -->
 
-The Intel Cilk Plus `include` directory contains header files useful for Cilk programs.
+The Intel(R) Cilk(TM) Plus `include` directory contains header files useful for Intel Cilk Plus programs.
 There are:
 
 *   Macros that provide alternative forms of the 
-    @ref language "Cilk language keywords".
-*   @ref api "An API" for querying and controlling aspects of the Cilk runtime
+    @ref language "Intel Cilk language keywords".
+*   @ref api "An API" for querying and controlling aspects of the Intel Cilk Plus runtime
     system.
-*   @ref Reducers "Cilk Reducers" - both the underlying infrastructure and the 
+*   @ref Reducers "Intel Cilk Plus Reducers" - both the underlying infrastructure and the 
     library of predefined reducers.
 *   @ref common "Assorted macros, classes, and functions" which are primarily
     intended as support code for the API and reducer libraries, but may also  be useful in end-user code.

@@ -43,7 +43,7 @@
         for your assistance in helping us improve Cilk Plus.
 -->
 
-@page pagereducers Intel Cilk Plus Reducers
+@page pagereducers Intel(R) Cilk(TM) Plus Reducers
 
 <!--    Sections have been coded using Doxygen section / subsection /
         subsubsection tags rather than MarkDown ## / ### / #### markers to work
@@ -64,7 +64,7 @@ each worker has access to a private instance of the variable, eliminating the
 possibility of races without requiring locks. When parallel strands merge,
 their variable instances are also merged ("reduced").
 
-The Cilk library includes a general reducer framework and a collection of
+The Intel Cilk Plus library includes a general reducer framework and a collection of
 predefined reducer classes to solve common specific problems. Many users will
 find a predefined reducer class that meets their needs; but more advanced users
 can use the framework to create new reducers to solve their problems.
@@ -210,7 +210,7 @@ parallelizing the entire algorithm.
 @section reducers_how_they_work How Reducers Work
 
 To understand how reducers work, it will be helpful to start with an
-understanding of [the Cilk execution model](http://software.intel.com/sites/products/documentation/doclib/stdxe/2013/composerxe/compiler/cpp-win/index.htm#GUID-54163CE9-E866-4C6D-B0D4-0613DD2EA984.htm).
+understanding of [the Intel Cilk Plus execution model](http://software.intel.com/sites/products/documentation/doclib/stdxe/2013/composerxe/compiler/cpp-win/index.htm#GUID-54163CE9-E866-4C6D-B0D4-0613DD2EA984.htm).
 
 @subsection reducers_htw_reduction_algorithms Reduction Algorithms
 
@@ -370,7 +370,7 @@ interested in these details.
 
 @paragraph reducers_htw_graph The Parallelism Graph
 
-The parallelism in an execution of a Cilk program can be represented by a
+The parallelism in an execution of a Intel Cilk Plus program can be represented by a
 _parallelism graph_. This is a directed acyclic graph (DAG) whose vertices
 represent the parallelism events in the program execution and whose edges
 represent the serial execution sequences between parallelism events, which

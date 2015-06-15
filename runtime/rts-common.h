@@ -75,8 +75,8 @@
 #define COMMON_SYSDEP
 #define NON_COMMON
 
-#if !(defined __GNUC__ || defined __ICC)
-#   define __builtin_expect(a_, b_) a_
+#if !(defined __GNUC__ || defined __ICC) || defined(_WRS_KERNEL)
+#   define __builtin_expect(a_, b_) (a_)
 #endif
 
 #ifdef __cplusplus

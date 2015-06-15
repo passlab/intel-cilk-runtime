@@ -47,8 +47,7 @@
  
 /** @file common.h
  *
- * @brief Defines common macros and structures used by the Intel Cilk Plus
- * runtime.
+ * @brief Defines common macros and structures used by the Intel(R) Cilk(TM) Plus runtime.
  *
  *  @ingroup common
  */
@@ -62,17 +61,17 @@
 #define INCLUDED_CILK_COMMON
 
 #ifdef __cplusplus
-/** Namespace for all Cilk definitions that can be included in user code.
+/** Namespace for all Intel Cilk Plus definitions that can be included in user code.
  */
 namespace cilk {
     
-    /** Namespace for definitions re-used in other Cilk definitions.
+    /** Namespace for definitions re-used in other Intel Cilk Plus definitions.
      */
     namespace internal {}
 }
 #endif
 
-/** Cilk library version = 1.02
+/** Intel Cilk Plus library version = 1.02
  */
 #define CILK_LIBRARY_VERSION 102
 
@@ -257,7 +256,7 @@ namespace cilk {
 
 /**
  * Functions marked as CILK_EXPORT_AND_INLINE have both
- * inline versions defined in the Cilk API, as well as
+ * inline versions defined in the Intel Cilk Plus API, as well as
  * non-inlined versions that are exported (for
  * compatibility with previous versions that did not
  * inline the functions).
@@ -316,7 +315,8 @@ namespace cilk {
 #endif  /* ! defined(_MSC_VER) || (_MSC_VER >= 1600) */
 
 /**
- * @brief Application Binary Interface (ABI) version of the Cilk runtime library.
+ * @brief Application Binary Interface (ABI) version of the Intel Cilk Plus runtime
+ * library.
  *
  * The compiler determines the ABI version used for compilation.  Object files
  * compiled with higher ABI versions are not compatible with libraries compiled

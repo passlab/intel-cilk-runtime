@@ -36,12 +36,14 @@ ___cilkrts_init
 
 ___cilkrts_leave_frame
 ___cilkrts_metacall
+___cilkrts_resume
 ___cilkrts_rethrow
 ___cilkrts_return_exception
 ___cilkrts_save_fp_ctrl_state
 ___cilkrts_set_param
 ___cilkrts_stack_alloc
 ___cilkrts_stack_free
+___cilkrts_suspend
 ___cilkrts_sync
 ___cilkrts_synched
 ___cilkrts_watch_stack

@@ -60,7 +60,7 @@
 
 #if defined _WIN32 || defined _WIN64
 # if !defined CILK_STUB && !defined IN_CILK_RUNTIME
-    /* bring in the Cilk library, which has definitions for some of these
+    /* bring in the Intel(R) Cilk(TM) Plus library, which has definitions for some of these
      * functions. */
 #   pragma comment(lib, "cilkrts")
 # endif
@@ -137,7 +137,7 @@ CILK_EXPORT
 
 #else // CILK_STUB
 
-// Programs compiled with CILK_STUB are not linked with the Cilk runtime 
+// Programs compiled with CILK_STUB are not linked with the Intel Cilk Plus runtime 
 // library, so they should not have external references to cilkrts functions.
 // Furthermore, they don't need the hyperobject functionality, so the
 // functions can be stubbed.

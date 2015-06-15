@@ -79,7 +79,11 @@
 const unsigned magic_number = 0x5afef00d;
 
 // Page size for stacks
+#ifdef _WRS_KERNEL
+long cilk_fiber_sysdep::s_page_size = 4096;
+#else
 long cilk_fiber_sysdep::s_page_size = sysconf(_SC_PAGESIZE);
+#endif
 
 cilk_fiber_sysdep::cilk_fiber_sysdep(std::size_t stack_size)
     : cilk_fiber(stack_size)

@@ -47,11 +47,11 @@
  
 /** @file cilk.h
  *
- *  @brief Provides convenient aliases for Cilk language keywords.
+ *  @brief Provides convenient aliases for Intel(R) Cilk(TM) language keywords.
  *
  *  @details
- *  Since Cilk is a nonstandard extension to both C and C++, the Cilk
- *  language keywords all begin with "`_Cilk_`", which guarantees that they
+ *  Since Intel Cilk Plus is a nonstandard extension to both C and C++, the Intel
+ *  Cilk language keywords all begin with "`_Cilk_`", which guarantees that they
  *  will not conflict with user-defined identifiers in properly written 
  *  programs. This way, a Cilk-enabled C or C++ compiler can safely compile 
  *  "standard" C and C++ programs.
@@ -61,7 +61,7 @@
  *
  *      #include "cilk/cilk.h"
  *
- *  and then write the Cilk keywords with a "`cilk_`" prefix instead of
+ *  and then write the Intel Cilk keywords with a "`cilk_`" prefix instead of
  *  "`_Cilk_`".
  *
  *  @ingroup language
@@ -69,7 +69,7 @@
  
  
 /** @defgroup language Language Keywords
- *  Definitions for the Cilk language.
+ *  Definitions for the Intel Cilk language.
  *  @{
  */
  

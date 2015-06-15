@@ -49,7 +49,7 @@
 #ifndef INCLUDED_CILK_STUB_DOT_H
 #define INCLUDED_CILK_STUB_DOT_H
 
-/* Definitions for creating a serialization from a Cilk program.
+/* Definitions for creating a serialization from an Intel(R) Cilk(TM) Plus program.
  * These definitions are suitable for use by a compiler that is not
  * Cilk-enabled.
  */
@@ -58,7 +58,7 @@
 #undef __cilk
 #define CILK_STUB
 
-/* Replace Cilk keywords with serial equivalents */
+/* Replace Intel Cilk keywords with serial equivalents */
 #define _Cilk_spawn
 #define _Cilk_sync
 #define _Cilk_for for

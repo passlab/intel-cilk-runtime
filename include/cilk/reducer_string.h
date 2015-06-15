@@ -68,9 +68,9 @@
  *
  *  @ingroup Reducers
  *
- *  You should be familiar with @ref pagereducers "Cilk reducers", described in
- *  file reducers.md, and particularly with @ref reducers_using, before trying
- *  to use the information in this file.
+ *  You should be familiar with @ref pagereducers "Intel(R) Cilk(TM) Plus reducers",
+ *  described in file reducers.md, and particularly with @ref reducers_using,
+ *  before trying to use the information in this file.
  *
  *  @section redstring_usage Usage Example
  *
@@ -416,10 +416,10 @@ public:
  *  @tparam Traits  The character traits type.
  *  @tparam Alloc   The string allocator type.
  *  @tparam Align   If `false` (the default), reducers instantiated on this
- *                  monoid will be naturally aligned (the Cilk library 1.0
+ *                  monoid will be naturally aligned (the Intel Cilk Plus library 1.0
  *                  behavior). If `true`, reducers instantiated on this monoid
  *                  will be cache-aligned for binary compatibility with
- *                  reducers in Cilk library version 0.9.
+ *                  reducers in Intel Cilk Plus library version 0.9.
  *
  *  @see ReducersString
  *  @see op_basic_string_view
@@ -698,10 +698,10 @@ public:
     //@}
 
     /** @name Upcast
-     *  @details In Cilk library 0.9, reducers were always cache-aligned. In
-     *  library  1.0, reducer cache alignment is optional. By default, reducers
-     *  are unaligned (i.e., just naturally aligned), but legacy wrappers
-     *  inherit from cache-aligned reducers for binary compatibility.
+     *  @details In Intel Cilk Plus library 0.9, reducers were always cache-aligned.
+     *  In library 1.0, reducer cache alignment is optional. By default,
+     *  reducers are unaligned (i.e., just naturally aligned), but legacy
+     *  wrappers inherit from cache-aligned reducers for binary compatibility.
      *
      *  This means that a wrapper will automatically be upcast to its aligned
      *  reducer base class. The following conversion operators provide

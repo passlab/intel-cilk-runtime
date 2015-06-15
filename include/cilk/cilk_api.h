@@ -47,7 +47,7 @@
 
 /** @file cilk_api.h
  *
- * @brief Defines the Intel Cilk Plus API for use by applications.
+ * @brief Defines the Intel(R) Cilk(TM) Plus API for use by applications.
  *
  *  @ingroup api
  */
@@ -105,7 +105,7 @@ enum __cilkrts_set_param_status {
 /** Sets user controllable runtime parameters
  *
  *  Call this function to set runtime parameters that control the behavior
- *  of the Cilk scheduler.
+ *  of the Intel Cilk Plus scheduler.
  *
  *  @param param    A string specifying the parameter to be set. One of:
  *  -   `"nworkers"`
@@ -117,7 +117,7 @@ enum __cilkrts_set_param_status {
  *  @par The "nworkers" parameter
  *
  *  This parameter specifies the number of worker threads to be created by the
- *  Cilk runtime. @a Value must be a string of digits to be parsed by
+ *  Intel Cilk Plus runtime. @a Value must be a string of digits to be parsed by
  *  `strtol()` as a decimal number.
  *
  *  The number of worker threads is:
@@ -128,17 +128,17 @@ enum __cilkrts_set_param_status {
  *  3.  the number of cores available, as reported by the operating system.
  *
  *  @note
- *  Technically, Cilk distinguishes between the _user thread_ (the thread that
- *  the user code was executing on when the Cilk runtime started), and
- *  _worker threads_ (new threads created by the Cilk runtime to support
- *  Cilk parallelism). `nworkers` actually includes both the user thread and
- *  the worker threads; that is, it is one greater than the number of true
- *  "worker threads".
+ *  Technically, Intel Cilk Plus distinguishes between the _user thread_ (the thread
+ *  that the user code was executing on when the Intel Cilk Plus runtime started),
+ *  and _worker threads_ (new threads created by the Intel Cilk Plus runtime to
+ *  support Intel Cilk Plus parallelism). `nworkers` actually includes both the user
+ *  thread and the worker threads; that is, it is one greater than the number of
+ *  true "worker threads".
  *
  *  @note
- *  Setting `nworkers = 1` produces serial behavior. Cilk spawns and syncs will
- *  be executed, but with only one worker, continuations will never be stolen,
- *  so all code will execute in serial.
+ *  Setting `nworkers = 1` produces serial behavior. Intel Cilk Plus spawns and syncs
+ *  will be executed, but with only one worker, continuations will never be
+ *  stolen, so all code will execute in serial.
  *
  *  @warning
  *  The number of worker threads can only be set *before* the runtime has
@@ -147,9 +147,9 @@ enum __cilkrts_set_param_status {
  *  to shut down the runtime to change the number of workers.
  *
  *  @warning
- *  The default Cilk scheduler behavior is usually pretty good. The ability
- *  to override `nworkers` can be useful for experimentation, but it won't
- *  usually be necessary for getting good performance.
+ *  The default Intel Cilk scheduler behavior is usually pretty good. The
+ *  ability to override `nworkers` can be useful for experimentation, but it
+ *  won't usually be necessary for getting good performance.
  *
  *  @par The "force reduce" parameter
  *
@@ -184,13 +184,13 @@ CILK_API(int) __cilkrts_set_param(const char *param, const char *value);
 CILK_API(int) __cilkrts_set_param_w(const wchar_t *param, const wchar_t *value);
 #endif
 
-/** Shuts down and deallocates all Cilk states. If Cilk is still in use by the
- * calling thread, the runtime aborts the application. Otherwise, the runtime
- * waits for all other threads using Cilk to exit.
+/** Shuts down and deallocates all Intel Cilk Plus states. If Intel Cilk Plus is still in
+ * use by the calling thread, the runtime aborts the application. Otherwise, the
+ * runtime waits for all other threads using Intel Cilk Plus to exit.
  */
 CILK_API(void) __cilkrts_end_cilk(void);
 
-/** Initializes Cilk data structures and start the runtime.
+/** Initializes Intel Cilk Plus data structures and start the runtime.
  */
 CILK_API(void) __cilkrts_init(void);
 
@@ -212,8 +212,8 @@ CILK_API(int) __cilkrts_get_total_workers(void);
 /** Returns a small integer identifying the current thread.
  *
  *  What thread is the function running on? Each worker thread
- *  started by the Cilk runtime library has a unique worker number in the range
- *  `1 .. nworkers - 1`.
+ *  started by the Intel Cilk Plus runtime library has a unique worker number in the
+ *  range `1 .. nworkers - 1`.
  *
  *  All _user_ threads (threads started by the user, or by other libraries) are
  *  identified as worker number 0. Therefore, the worker number is not unique
@@ -242,10 +242,11 @@ typedef void (*__cilkrts_pfn_seh_callback)(const _EXCEPTION_RECORD *exception);
 
 /** Specifies a function to call when a non-C++ exception is caught.
  *
- *  Intel Cilk Plus parallelism plays nicely with C++ exception handling, but the
- *  Intel Cilk Plus runtime has no way to unwind the stack across a strand boundary
- *  for Microsoft SEH ("Structured Exception Handling") exceptions. Therefore,
- *  when the runtime catches such an exception, it must abort the application.
+ *  Intel Cilk Plus parallelism plays nicely with C++ exception handling, but
+ *  the Intel Cilk Plus runtime has no way to unwind the stack across a strand
+ *  boundary for Microsoft SEH ("Structured Exception Handling") exceptions.
+ *  Therefore, when the runtime catches such an exception, it must abort the
+ *  application.
  *
  *  If an SEH callback has been set, the runtime will call it before aborting.
  *
@@ -317,7 +318,7 @@ typedef struct
  *  @deprecated
  *  Use __cilkrts_get_pedigree() instead.
  *
- *  This routine allows code to walk up the stack of Cilk frames to gather
+ *  This routine allows code to walk up the stack of Intel Cilk Plus frames to gather
  *  the pedigree.
  *
  *  Initialize the pedigree walk by filling the pedigree context with NULLs
@@ -386,7 +387,7 @@ __CILKRTS_END_EXTERN_C
 
 #else /* CILK_STUB */
 
-// Programs compiled with CILK_STUB are not linked with the Cilk runtime
+// Programs compiled with CILK_STUB are not linked with the Intel Cilk Plus runtime
 // library, so they should not have external references to runtime functions.
 // Therefore, the functions are replaced with stubs.
 

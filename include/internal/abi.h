@@ -472,6 +472,20 @@ CILK_ABI(void) __cilkrts_enter_frame_fast_1(__cilkrts_stack_frame *sf);
 CILK_ABI(void) __cilkrts_leave_frame(__cilkrts_stack_frame *sf);
 
 /**
+ * Suspends the runtime by notifying the workers that they should not try to
+ * steal. This function is supposed to be called from a non-parallel region
+ * (i.e., after cilk_sync in the top-level spawning function). Otherwise,
+ * which workers are sleeping or busy is unpredictable in general.
+ * The runtime can be resumed by calling __cilkrts_resume().
+ */
+CILK_ABI(void) __cilkrts_suspend(void);
+
+/**
+ * Resumes the runtime by notifying the workers that they can steal.
+ */
+CILK_ABI(void) __cilkrts_resume(void);
+
+/**
  * Wait for any spawned children of this function to complete before
  * continuing.  This function will only return when the join counter
  * has gone to 0.  Other workers will re-enter the scheduling loop to

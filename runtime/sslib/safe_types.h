@@ -47,7 +47,9 @@ typedef int errno_t;
 
 #include <stdio.h>
 #include <sys/types.h>
+#ifndef _WRS_KERNEL
 #include <inttypes.h>
+#endif
 #include <stdint.h>
 #include <errno.h>
 

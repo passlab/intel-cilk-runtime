@@ -58,6 +58,13 @@
 
 #define CILK_C_DEFINE_REDUCERS
 
+#ifdef _WRS_KERNEL
+#define WCHAR_MIN   0
+#define WCHAR_MAX   USHRT_MAX
+#define WINT_MIN    INT_MIN
+#define WINT_MAX    INT_MAX
+#endif
+
 #include <cilk/reducer_opadd.h>
 #include <cilk/reducer_opand.h>
 #include <cilk/reducer_opmul.h>

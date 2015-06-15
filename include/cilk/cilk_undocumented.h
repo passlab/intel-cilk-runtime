@@ -94,7 +94,7 @@ CILK_EXPORT __CILKRTS_NOTHROW
 void *__cilkrts_get_sf(void);
 
 /**
- * Returns the size of stacks created by Cilk.
+ * Returns the size of stacks created by Intel(R) Cilk(TM) Plus.
  */
 CILK_EXPORT __CILKRTS_NOTHROW
 size_t __cilkrts_get_stack_size(void);

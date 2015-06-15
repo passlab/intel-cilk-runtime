@@ -68,9 +68,9 @@
  *
  *  @ingroup Reducers
  *
- *  You should be familiar with @ref pagereducers "Cilk reducers", described in
- *  file `reducers.md`, and particularly with @ref reducers_using, before trying
- *  to use the information in this file.
+ *  You should be familiar with @ref pagereducers "Intel(R) Cilk(TM) Plus reducers",
+ *  described in file `reducers.md`, and particularly with @ref reducers_using,
+ *  before trying to use the information in this file.
  *
  *  @section redvector_usage Usage Example
  *

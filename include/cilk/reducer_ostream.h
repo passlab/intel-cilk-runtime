@@ -67,9 +67,9 @@
  *
  *  @ingroup Reducers
  *
- *  You should be familiar with @ref pagereducers "Cilk reducers", described in
- *  file reducers.md, and particularly with @ref reducers_using, before trying
- *  to use the information in this file.
+ *  You should be familiar with @ref pagereducers "Intel(R) Cilk(TM) Plus reducers",
+ *  described in file reducers.md, and particularly with @ref reducers_using,
+ *  before trying to use the information in this file.
  *
  *  @section redostream_usage Usage Example
  *
@@ -491,10 +491,10 @@ public:
     //@}
 
     /** @name Upcast
-     *  @details In Cilk library 0.9, reducers were always cache-aligned. In
-     *  library  1.0, reducer cache alignment is optional. By default, reducers
-     *  are unaligned (i.e., just naturally aligned), but legacy wrappers
-     *  inherit from cache-aligned reducers for binary compatibility.
+     *  @details In Intel Cilk Plus library 0.9, reducers were always cache-aligned.
+     *  In library  1.0, reducer cache alignment is optional. By default,
+     *  reducers are unaligned (i.e., just naturally aligned), but legacy
+     *  wrappers inherit from cache-aligned reducers for binary compatibility.
      *
      *  This means that a wrapper will automatically be upcast to its aligned
      *  reducer base class. The following conversion operators provide

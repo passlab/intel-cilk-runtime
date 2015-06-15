@@ -47,7 +47,7 @@
 
 /** @file reducer.h
  *
- *  @brief Defines foundation classes for creating Cilk reducers.
+ *  @brief Defines foundation classes for creating Intel(R) Cilk(TM) Plus reducers.
  *
  *  @ingroup Reducers
  *
@@ -204,9 +204,9 @@ public:
          *  Default is false (unaligned) unless overridden in a subclass.
          *
          *  @since 1.02
-         *  (In Cilk library versions 1.0 and 1.01, the default was true.
-         *  In Cilk library versions prior to 1.0, reducers were always aligned,
-         *  and this data member did not exist.)
+         *  (In Intel Cilk Plus library versions 1.0 and 1.01, the default was true.
+         *  In Intel Cilk Plus library versions prior to 1.0, reducers were always
+         *  aligned, and this data member did not exist.)
          */
         align_reducer = false
     };
@@ -430,7 +430,7 @@ public:
  *  customization of the monoid_with_view class itself is needed beyond
  *  instantiating it with an appropriate view class. (Customized subclasses of
  *  monoid_with_view may be needed for other reasons, such as to keep some
- *   state for the reducer.) All of the Cilk predefined reducers use
+ *   state for the reducer.) All of the Intel Cilk Plus predefined reducers use
  *  monoid_with_view or one of its subclasses.
  *
  *  The view class `View` of a monoid_with_view must provide the following
@@ -661,7 +661,7 @@ move_in_wrapper<Type> move_in(const Type& ref)
 
 /** Wrapper class to allow implicit downcasts to reducer subclasses.
  *
- *  The Cilk library contains a collection of reducer wrapper classes which
+ *  The Intel Cilk Plus library contains a collection of reducer wrapper classes which
  *  were created before the `cilk::reducer<Monoid>` style was developed. For
  *  example, `cilk::reducer_opadd<Type>` provided essentially the same
  *  functionality that is now provided by
@@ -1305,8 +1305,8 @@ class reducer : public internal::reducer_content<Monoid>
     //@{
     /** Deprecated view access.
      *
-     *  `r()` is a synonym for `*r` which was used with early versions of Cilk
-     *  reducers. `*r` is now the preferred usage.
+     *  `r()` is a synonym for `*r` which was used with early versions of
+     *  Intel Cilk Plus reducers. `*r` is now the preferred usage.
      *
      *  @deprecated Use operator*() instead of operator()().
      *
@@ -1532,7 +1532,7 @@ using stub::reducer;
  *
  *  @tableofcontents
  *
- *  The Cilk runtime supports reducers written in C as well as in C++. The
+ *  The Intel Cilk Plus runtime supports reducers written in C as well as in C++. The
  *  basic logic is the same, but the implementation details are very
  *  different. The C++ reducer implementation uses templates heavily to create
  *  very generic components. The C reducer implementation uses macros, which
@@ -1545,9 +1545,9 @@ using stub::reducer;
  *  The basic usage pattern for C reducers is:
  *
  *  1.  Create and initialize a reducer object.
- *  2.  Tell the Cilk runtime about the reducer.
+ *  2.  Tell the Intel Cilk Plus runtime about the reducer.
  *  3.  Update the value contained in the reducer in a parallel computation.
- *  4.  Tell the Cilk runtime that you are done with the reducer.
+ *  4.  Tell the Intel Cilk Plus runtime that you are done with the reducer.
  *  5.  Retrieve the value from the reducer.
  *
  *  @subsection reducers_c_creation Creating and Initializing a C Reducer
@@ -1610,10 +1610,11 @@ using stub::reducer;
  *  The runtime function `__cilkrts_hyperobject_noop_destroy` can be used for
  *  the destructor function if the reducer's values do not need any cleanup.
  *
- *  @subsection reducers_c_register Tell the Cilk Runtime About the Reducer
+ *  @subsection reducers_c_register Tell the Intel Cilk Plus Runtime About the
+ *  Reducer
  *
  *  Call the @ref CILK_C_REGISTER_REDUCER macro to register the reducer with
- *  the Cilk runtime:
+ *  the Intel Cilk Plus runtime:
  *
  *      CILK_C_REGISTER_REDUCER(reducer-name);
  *
@@ -1632,12 +1633,12 @@ using stub::reducer;
  *  protection is provided for C reducers.  It is entirely the responsibility
  *  of the user to avoid modifying the value in any inappropriate way.
  *
- *  @subsection c_reducers_unregister Tell the Cilk Runtime That You Are Done
- *  with the Reducer
+ *  @subsection c_reducers_unregister Tell the Intel Cilk Plus Runtime That You Are
+ *  Done with the Reducer
  *
  *  When the parallel computation is complete, call the @ref
- *  CILK_C_UNREGISTER_REDUCER macro to unregister the reducer with the Cilk
- *  runtime:
+ *  CILK_C_UNREGISTER_REDUCER macro to unregister the reducer with the
+ *  Intel Cilk Plus runtime:
  *
  *      CILK_C_UNREGISTER_REDUCER(reducer-name);
  *
@@ -1715,9 +1716,9 @@ using stub::reducer;
  *
  *  @section reducers_c_predefined Predefined C Reducers
  *
- *  Some of the predefined reducer classes in the Cilk library come with a set
- *  of predefined macros to provide the same capabilities in C. In general,
- *  two macros are provided for each predefined reducer family:
+ *  Some of the predefined reducer classes in the Intel Cilk Plus library come with
+ *  a set of predefined macros to provide the same capabilities in C.
+ *  In general, two macros are provided for each predefined reducer family:
  *
  *  -   `CILK_C_REDUCER_operation(reducer-name, type-name, initial-value)` -
  *      Declares a reducer object named _reducer-name_ with initial value
@@ -1748,8 +1749,8 @@ using stub::reducer;
  *  |   multiplication  |   `OPMUL`     |   @ref ReducersMul            |
  *  |   minimum         |   `MIN`       |   @ref ReducersMinMax         |
  *  |   minimum & index |   `MIN_INDEX` |   @ref ReducersMinMax         |
- *  |   maximum         |   `MIN`       |   @ref ReducersMinMax         |
- *  |   maximum & index |   `MIN_INDEX` |   @ref ReducersMinMax         |
+ *  |   maximum         |   `MAX`       |   @ref ReducersMinMax         |
+ *  |   maximum & index |   `MAX_INDEX` |   @ref ReducersMinMax         |
  *
  *  @subsection reducers_c_type_names Numeric Type Names
  *
@@ -1939,7 +1940,7 @@ using stub::reducer;
     ,   __VA_ARGS__                                                     \
     }
 
-/** Register a reducer with the Cilk runtime.
+/** Register a reducer with the Intel Cilk Plus runtime.
  *
  *  The runtime will manage reducer values for all registered reducers when
  *  parallel execution strands begin and end. For example:
@@ -1956,7 +1957,7 @@ using stub::reducer;
 #define CILK_C_REGISTER_REDUCER(Expr) \
     __cilkrts_hyper_create(&(Expr).__cilkrts_hyperbase)
 
-/** Unregister a reducer with the Cilk runtime.
+/** Unregister a reducer with the Intel Cilk Plus runtime.
  *
  *  The runtime will stop managing reducer values for a reducer after it is
  *  unregistered. For example:

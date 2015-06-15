@@ -508,11 +508,25 @@ COMMON_SYSDEP void cilkos_warning(const char *fmt, ...)
     fflush(stderr);
 }
 
+#ifdef __VXWORKS__
+#ifdef _WRS_KERNEL
+void cilkStart()
+{
+    __cilkrts_init_tls_variables();
+}
+#else
+_WRS_CONSTRUCTOR(cilkInit, 100)
+{
+    __cilkrts_init_tls_variables();
+}
+#endif
+#else
 static void __attribute__((constructor)) init_once()
 {
     /*__cilkrts_debugger_notification_internal(CILK_DB_RUNTIME_LOADED);*/
     __cilkrts_init_tls_variables();
 }
+#endif
 
 
 #define PAGE 4096

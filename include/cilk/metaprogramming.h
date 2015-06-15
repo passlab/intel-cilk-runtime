@@ -47,7 +47,7 @@
 
 /** @file metaprogramming.h
  *
- *  @brief Defines metaprogramming utility classes used in the Cilk library.
+ *  @brief Defines metaprogramming utility classes used in the Intel(R) Cilk(TM) Plus library.
  *
  *  @ingroup common
  */
@@ -483,7 +483,7 @@ inline void* allocate_aligned(std::size_t size, std::size_t alignment)
 #ifdef _WIN32
     return _aligned_malloc(size, alignment);
 #else
-#if defined(__ANDROID__)
+#if defined(__ANDROID__) || defined(__VXWORKS__)
     return memalign(std::max(alignment, sizeof(void*)), size);
 #else
     void* ptr;

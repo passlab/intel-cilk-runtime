@@ -71,8 +71,8 @@
  * common variable where it is not necessary to preserve changes from
  * different parallel strands.  In effect, a holder acts a bit like
  * thread-local storage, but has qualities that work better with the
- * fork-join structure of Cilk.  In particular, a holder has the following
- * qualities:
+ * fork-join structure of Intel(R) Cilk(TM) Plus.  In particular, a holder has the
+ * following qualities:
  *
  * - The view of a holder before the first spawn within a function is the same
  *   as the view after each sync (as in the case of a reducer).
@@ -231,7 +231,7 @@
  * same as the view on entry to 'h'.  More importantly, the view of the holder
  * within the recursive call to 'compute' is the same as the view on entry to
  * 'h', even if a different worker is executing the recursive call.  Thus, the
- * holder view within a Cilk program has useful qualities not found in
+ * holder view within a Intel Cilk Plus program has useful qualities not found in
  * thread-local storage.
  */
 
