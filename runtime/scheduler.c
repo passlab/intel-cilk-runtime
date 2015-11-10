@@ -1789,7 +1789,15 @@ static full_frame* check_for_work(__cilkrts_worker *w)
         if (NULL == ff) {
             // Punish the worker for failing to steal.
             // No quantum for you!
-            __cilkrts_yield();
+            if (w->l->steal_failure_count > 30000) {
+                // Punish more if the worker has been doing unsuccessful steals
+                // for a long time. After return from the idle state, it will
+                // be given a grace period to react quickly.
+                __cilkrts_idle();
+                w->l->steal_failure_count -= 300;
+            } else {
+                __cilkrts_yield();
+            }
             w->l->steal_failure_count++;
         } else {
             // Reset steal_failure_count since there is obviously still work to

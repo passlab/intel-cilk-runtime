@@ -48,6 +48,8 @@ case "${target}" in
     ;;
   i?86-*-*)
     ;;
+  arm-*-*)
+    ;;
   *-*-*)
     UNSUPPORTED=1
     ;;

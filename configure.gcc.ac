@@ -148,6 +148,10 @@ case "${target}" in
     config_dir="x86"
     ;;
 
+  arm-*-*)
+    config_dir="arm"
+    ;;
+
   *)
     config_dir="generic"
     ;;

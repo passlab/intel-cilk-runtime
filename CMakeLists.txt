@@ -194,20 +194,23 @@ if(${WIN32})
     set(cilk_flags
         /Q_multisrc-
         /DUNICODE
-        /DIN_CILK_RUNTIME
+        /DIN_CILK_RUNTIME=1
         /EHsc
-        /fp:fast
         /GS
     )
     set(cilk_c_flags
         /Qstd=c99
     )
-    set(cilkrts_link_flags
+    set(cilk_cxx_flags
+        /GR-
+    )
+    set(cilk_link_flags
         /DYNAMICBASE
         /NXCOMPAT
         /DEBUG
         /PDB:cilkrts20.pdb
         /DEF:${CilkRuntime_SOURCE_DIR}/runtime/cilk-exports.def
+        /ENTRY:cilkrts_module_startup
     )
     set_property(SOURCE ${cilkrts_sysdep}/cilk-abi-vla.c
                  APPEND PROPERTY COMPILE_FLAGS
@@ -218,10 +221,13 @@ if(${WIN32})
                      APPEND PROPERTY COMPILE_FLAGS
                      "/D_MSC_VER=${MSVC_VERSION} /safeseh"
         )
-        list(APPEND cilkrts_link_flags /SAFESEH)
+        list(APPEND cilk_link_flags /SAFESEH)
     endif()
     if("${CILK_BUILD_TYPE}" STREQUAL "Release")
         list(APPEND cilk_flags /Qipo)
+    endif()
+    if("${CILK_BUILD_TYPE}" STREQUAL "Debug")
+        list(APPEND cilk_flags /DSUPPORT_GET_CURRENT_FIBER=1)
     endif()
 else()
     # Common *nix flags
@@ -264,11 +270,11 @@ else()
     endif()
     # Link flags
     if(${APPLE})
-        list(APPEND cilkrts_link_flags
+        list(APPEND cilk_link_flags
              "-Wl,-exported_symbols_list,${CilkRuntime_SOURCE_DIR}/runtime/mac-symbols.txt"
         )
     else()
-        list(APPEND cilkrts_link_flags
+        list(APPEND cilk_link_flags
              "-Wl,--version-script,${CilkRuntime_SOURCE_DIR}/runtime/gnu-symbols.ver"
              # security flags
              -Wl,-z,noexecstack
@@ -280,11 +286,11 @@ endif()
 
 # Override the default flags for Windows build.
 if(${WIN32})
-    set(CMAKE_CXX_FLAGS "/DWIN32 /D_WINDOWS /W3")
     set(CMAKE_C_FLAGS_RELEASE "/MT /O2 /Ob2 /DNDEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "/MT /O2 /Ob2 /DNDEBUG")
     set(CMAKE_C_FLAGS_DEBUG "/D_DEBUG /MTd /Zi /Od /Ob0 /RTC1")
     set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /Zi /Od /Ob0 /RTC1")
+    set(CMAKE_SHARED_LINKER_FLAGS_DEBUG "${CMAKE_SHARED_LINKER_FLAGS_DEBUG} /INCREMENTAL:NO")
 endif()
 # Sets global flags.
 foreach(f ${cilk_flags})
@@ -294,7 +300,10 @@ endforeach()
 foreach(f ${cilk_c_flags})
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${f}")
 endforeach()
-foreach(f ${cilkrts_link_flags})
+foreach(f ${cilk_cxx_flags})
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${f}")
+endforeach()
+foreach(f ${cilk_link_flags})
     set(final_link_flags "${final_link_flags} ${f}")
 endforeach()
 
@@ -314,6 +323,7 @@ if(${WIN32})
 else()
     set_target_properties(cilkrts PROPERTIES
                           OSX_ARCHITECTURES x86_64
+                          MACOSX_RPATH true
                           LINKER_LANGUAGE CXX
                           LINK_FLAGS ${final_link_flags}
                           SOVERSION 5 # should be compatible with clang

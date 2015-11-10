@@ -240,7 +240,7 @@ namespace cilk {
 /**
  * OS-independent macro to specify a function that should be inlined
  */
-#ifdef __cpluspus
+#ifdef __cplusplus
     // C++
 #   define __CILKRTS_INLINE inline
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L

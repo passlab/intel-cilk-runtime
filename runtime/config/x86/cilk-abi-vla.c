@@ -237,11 +237,17 @@ __cilkrts_stack_alloc(
                         // be tagged
 )
 {
-#ifdef __INTEL_COMPILER
     // full_size will be a multiple of align, and contains
     // enough extra space to allocate a marker.
     size_t full_size = (size + align - 1) & ~(align - 1);
 
+#ifndef __INTEL_COMPILER
+    // Allocate memory from the heap.  The compiler is responsible
+    // for guaranteeing us a chance to free it before the function
+    // exits
+    return (void *)vla_internal_heap_alloc(sf, full_size, align);
+
+#else
     if (needs_tag) {
         full_size += align;
     }
@@ -332,10 +338,7 @@ __cilkrts_stack_alloc(
     }
 
     return t;
-#else // Not __INTEL_COMPILER
-    // Not supported unless we can figure out how to get the size of the frame
-    return NULL;
-#endif
+#endif // __INTEL_COMPILER
 }
 
 // This frees the space allocated for a variable length array.
@@ -352,12 +355,17 @@ __cilkrts_stack_free(
                                // on the stack, and therefore has no tag
 )
 {
-#ifdef __INTEL_COMPILER
-    uint32_t *t = (uint32_t*)p;
-
     // full_size will be a multiple of align, and contains
     // enough extra space to allocate a marker if one was needed.
     size_t full_size = (size + align - 1) & ~(align - 1);
+
+#ifndef __INTEL_COMPILER
+    // Just free the allocated memory to the heap since we don't know
+    // how to expand/contract the calling frame
+    vla_internal_heap_free(p, full_size);
+
+#else
+    uint32_t *t = (uint32_t*)p;
     if (known_from_stack == 0) {
         // if the compiler hasn't told the run-time that this is
         // known to be on the stack, then this pointer must have been
@@ -431,7 +439,5 @@ __cilkrts_stack_free(
     else {
         vla_internal_heap_free(t, full_size);
     }
-#else // Not __INTEL_COMPILER
-    // Not supported unless we can figure out how to get the size of the frame
-#endif
+#endif // __INTEL_COMPILER
 }

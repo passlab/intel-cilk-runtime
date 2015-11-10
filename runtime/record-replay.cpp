@@ -57,7 +57,7 @@
 #include <stdlib.h>
 
 // clang is really strict about printf formats, so use the annoying integer
-// printf macros.  Unfortunately they're not avaiable on Windows (and on VxWorks)
+// printf macros.  Unfortunately they're not available on Windows (or on VxWorks)
 #if defined(_WIN32) || defined(_WRS_KERNEL)
 #define PRIu64 "llu"
 #else

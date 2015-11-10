@@ -168,6 +168,7 @@ COMMON_SYSDEP int __cilkrts_xchg(volatile int *ptr, int x);
 
 COMMON_SYSDEP void __cilkrts_sleep(void); ///< Sleep briefly 
 COMMON_SYSDEP void __cilkrts_yield(void); ///< Yield quantum 
+COMMON_SYSDEP void __cilkrts_idle(void);  ///< Idle
 
 /**
  * @brief Gets environment variable 'varname' and copy its value into 'value'.

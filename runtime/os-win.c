@@ -329,6 +329,11 @@ COMMON_SYSDEP void __cilkrts_fence(void)
     }
 }
 
+COMMON_SYSDEP void __cilkrts_idle(void)
+{
+    Sleep(0);
+}
+
 COMMON_SYSDEP void __cilkrts_sleep(void)
 {
     Sleep(1);   // 1 millisecond

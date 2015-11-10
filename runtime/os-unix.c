@@ -420,6 +420,25 @@ COMMON_SYSDEP int __cilkrts_hardware_cpu_count(void)
 #endif
 }
 
+COMMON_SYSDEP void __cilkrts_idle(void)
+{
+    // This is another version of __cilkrts_yield() to be used when
+    // silencing workers that are not stealing work.
+#if defined(__ANDROID__)  || \
+    defined(__FreeBSD__)  || \
+    defined(__VXWORKS__)  || \
+    (defined(__sun__) && defined(__svr4__))
+    sched_yield();
+#elif defined(__MIC__)
+    _mm_delay_32(1024);
+#elif defined(__linux__) || \
+      defined(__APPLE__)
+    usleep(10000);
+#else
+# error "Unsupported architecture"
+#endif
+}
+
 COMMON_SYSDEP void __cilkrts_sleep(void)
 {
 #ifdef __VXWORKS__
