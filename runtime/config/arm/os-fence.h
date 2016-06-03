@@ -2,7 +2,7 @@
  *
  *************************************************************************
  *
- *  Copyright (C) 2009-2015, Intel Corporation
+ *  Copyright (C) 2009-2016, Intel Corporation
  *  All rights reserved.
  *  
  *  Redistribution and use in source and binary forms, with or without
@@ -40,12 +40,20 @@
  *  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
  *  time that a new version is released. Changes only submitted to the
  *  GNU compiler collection or posted to the git repository at
- *  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+ *  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
  *  not tracked.
  *  
  *  We welcome your contributions to this open source project. Thank you
  *  for your assistance in helping us improve Cilk Plus.
  **************************************************************************/
+
+// __atomic_* intrinsics are available since GCC 4.7.
+#define HAVE_ATOMIC_INTRINSICS defined(__GNUC__) && \
+                               (__GNUC__ * 10 + __GNUC_MINOR__ >= 47)
+
+// GCC before 4.4 does not implement __sync_synchronize properly
+#define HAVE_SYNC_INTRINSICS defined(__GNUC__) && \
+                             (__GNUC__ * 10 + __GNUC_MINOR__ >= 44)
 
 /*
  * void __cilkrts_fence(void)
@@ -60,5 +68,12 @@
  * the CPUID instruction).
  */
 
-// COMMON_SYSDEP void __cilkrts_fence(void); ///< MFENCE instruction
-# define __cilkrts_fence() __asm__ __volatile__ ("mcr   p15,0,%[t],c7,c10,4\n" :: [t] "r" (0) : "memory");
+#if HAVE_ATOMIC_INTRINSICS
+#   define __cilkrts_fence() __atomic_thread_fence(__ATOMIC_SEQ_CST)
+#elif HAVE_SYNC_INTRINSICS
+#   define __cilkrts_fence() __sync_synchronize()
+#else
+#   define __cilkrts_fence()
+// Leaving this code just in case.
+//# define __cilkrts_fence() __asm__ __volatile__ ("mcr   p15,0,%[t],c7,c10,4\n" :: [t] "r" (0) : "memory");
+#endif

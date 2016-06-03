@@ -1,6 +1,6 @@
 // cilk_version.h
 //
-//  Copyright (C) 2009-2015, Intel Corporation
+//  Copyright (C) 2009-2016, Intel Corporation
 //  All rights reserved.
 //  
 //  Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@
 //  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
 //  time that a new version is released. Changes only submitted to the
 //  GNU compiler collection or posted to the git repository at
-//  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+//  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
 //  not tracked.
 //  
 //  We welcome your contributions to this open source project. Thank you
@@ -49,10 +49,10 @@
 
 #define VERSION_MAJOR 2
 #define VERSION_MINOR 0
-#define VERSION_BUILD 4420
+#define VERSION_BUILD 4467
 #define VERSION_REV 0
-#define VERSION_STRING "2,0,4420,0"
-#define VERSION_HASH "3b2d6aa9059c"
+#define VERSION_STRING "2,0,4467,0"
+#define VERSION_HASH "b7e54d87bd17"
 #define VERSION_BRANCH "eng"
-#define TBB_REV_NUMBER "14788"
-#define VERSION_YEAR "2015"
+#define TBB_REV_NUMBER ""
+#define VERSION_YEAR "2016"

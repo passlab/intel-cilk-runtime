@@ -1,4 +1,4 @@
-#  Copyright (C) 2011-2015, Intel Corporation
+#  Copyright (C) 2011-2016, Intel Corporation
 #  All rights reserved.
 #  
 #  Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@
 #  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
 #  time that a new version is released. Changes only submitted to the
 #  GNU compiler collection or posted to the git repository at
-#  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+#  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
 #  not tracked.
 #  
 #  We welcome your contributions to this open source project. Thank you
@@ -59,6 +59,10 @@ AC_USE_SYSTEM_EXTENSIONS
 
 # Check whether alloca.h is available
 AC_FUNC_ALLOCA
+
+# Check for dl functions
+AC_CHECK_LIB(dl, dladdr,
+             [AC_DEFINE(HAVE_DLADDR, 1, [Define if you have dladdr()])])
 
 # Build a DLL on Windows
 AC_LIBTOOL_WIN32_DLL
@@ -113,16 +117,16 @@ esac
 # contains information on what's needed
 case "${target}" in
 
-  x86_64-*-*)
-    config_dir="x86"
-    ;;
-
-  i?86-*-*)
+  i?86-*-* | x86_64-*-*)
     config_dir="x86"
     ;;
 
   arm-*-*)
     config_dir="arm"
+    ;;
+
+  sparc*-*-*)
+    config_dir="sparc"
     ;;
 
   *)

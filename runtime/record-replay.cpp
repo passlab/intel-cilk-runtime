@@ -2,7 +2,7 @@
  *
  *************************************************************************
  *
- *  Copyright (C) 2012-2015, Intel Corporation
+ *  Copyright (C) 2012-2016, Intel Corporation
  *  All rights reserved.
  *  
  *  Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  *  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
  *  time that a new version is released. Changes only submitted to the
  *  GNU compiler collection or posted to the git repository at
- *  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+ *  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
  *  not tracked.
  *  
  *  We welcome your contributions to this open source project. Thank you
@@ -262,7 +262,7 @@ char * walk_pedigree_nodes(char *p, const __cilkrts_pedigree *pnode)
     if (pnode->parent)
     {
         p = walk_pedigree_nodes(p, pnode->parent);
-        p += cilk_snprintf_s(p, PEDIGREE_BUFF_SIZE, "%s", "_");
+        p += cilk_snprintf_s(p, PEDIGREE_BUFF_SIZE, "%s", (char *)"_");
     }
     return p + cilk_snprintf_l(p, PEDIGREE_BUFF_SIZE, "%" PRIu64, pnode->rank);
 }

@@ -1,4 +1,4 @@
-#  Copyright (C) 2011-2015, Intel Corporation
+#  Copyright (C) 2011-2016, Intel Corporation
 #  All rights reserved.
 #  
 #  Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@
 #  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
 #  time that a new version is released. Changes only submitted to the
 #  GNU compiler collection or posted to the git repository at
-#  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+#  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
 #  not tracked.
 #  
 #  We welcome your contributions to this open source project. Thank you
@@ -56,6 +56,9 @@ GENERAL_FLAGS += -fpic -O3
 
 # Enable Intel Cilk Plus extension
 GENERAL_FLAGS += -fcilkplus
+
+#Always generate unwind tables
+GENERAL_FLAGS += -funwind-tables
 
 AM_CFLAGS = $(XCFLAGS) $(GENERAL_FLAGS) -std=c99
 AM_CPPFLAGS = $(GENERAL_FLAGS)

@@ -154,6 +154,9 @@ automatically include the Cilk Plus runtime.
 
 Thanks to Eric Olson for sharing his patch for Raspberry Pi* with us.
 
+Thanks to Rainer Orth for submitting patches for exception handling and
+enabling Cilk Plus on the SPARC* architecture.
+
 ------------------------
 Intel and Cilk are trademarks of Intel Corporation in the U.S. and/or
 other countries.

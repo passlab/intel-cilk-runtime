@@ -2,7 +2,7 @@
  *
  *************************************************************************
  *
- *  Copyright (C) 2009-2015, Intel Corporation
+ *  Copyright (C) 2009-2016, Intel Corporation
  *  All rights reserved.
  *  
  *  Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  *  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
  *  time that a new version is released. Changes only submitted to the
  *  GNU compiler collection or posted to the git repository at
- *  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+ *  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
  *  not tracked.
  *  
  *  We welcome your contributions to this open source project. Thank you
@@ -432,7 +432,9 @@ COMMON_SYSDEP void __cilkrts_idle(void)
 #elif defined(__MIC__)
     _mm_delay_32(1024);
 #elif defined(__linux__) || \
-      defined(__APPLE__)
+      defined(__APPLE__) || \
+      defined(__CYGWIN__)
+      
     usleep(10000);
 #else
 # error "Unsupported architecture"
@@ -452,6 +454,7 @@ COMMON_SYSDEP void __cilkrts_yield(void)
 {
 #if defined(__ANDROID__)  || \
     defined(__APPLE__)    || \
+    defined(__CYGWIN__)   || \
     defined(__FreeBSD__)  || \
     defined(__VXWORKS__)  || \
     (defined(__sun__) && defined(__svr4__))

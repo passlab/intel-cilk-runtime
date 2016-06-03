@@ -2,7 +2,7 @@
  *
  *************************************************************************
  *
- *  Copyright (C) 2009-2015, Intel Corporation
+ *  Copyright (C) 2009-2016, Intel Corporation
  *  All rights reserved.
  *  
  *  Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  *  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
  *  time that a new version is released. Changes only submitted to the
  *  GNU compiler collection or posted to the git repository at
- *  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+ *  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
  *  not tracked.
  *  
  *  We welcome your contributions to this open source project. Thank you
@@ -473,8 +473,6 @@ static void write_version_file(global_state_t *g, int nWorkers)
     fprintf (version_file, "System cores: %d\n", sys_info.dwNumberOfProcessors);
     fprintf (version_file, "Cilk workers requested: %d\n", nWorkers);
 
-        fprintf (version_file, "Thread creator: Private\n");
-
     // Only close the file if we're not using either stdout or stderr
     if (close_file)
         fclose(version_file);
@@ -605,6 +603,7 @@ void __cilkrts_stop_workers(global_state_t *g)
                                        INFINITE);            // Do not timeout
             CILK_ASSERT(WAIT_FAILED != status);
         }
+
 
     return;
 }

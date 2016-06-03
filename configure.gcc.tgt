@@ -1,4 +1,4 @@
-#  Copyright (C) 2013-2015, Intel Corporation
+#  Copyright (C) 2013-2016, Intel Corporation
 #  All rights reserved.
 #  
 #  Redistribution and use in source and binary forms, with or without
@@ -36,19 +36,19 @@
 #  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
 #  time that a new version is released. Changes only submitted to the
 #  GNU compiler collection or posted to the git repository at
-#  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+#  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
 #  not tracked.
 #  
 #  We welcome your contributions to this open source project. Thank you
 #  for your assistance in helping us improve Cilk Plus.
 
-# Disable Cilk Runtime library for non x86 architecture...for now.
+# Disable Cilk Runtime library for unsupported architectures.
 case "${target}" in
-  x86_64-*-*)
-    ;;
-  i?86-*-*)
+  i?86-*-* | x86_64-*-*)
     ;;
   arm-*-*)
+    ;;
+  sparc*-*-*)
     ;;
   *-*-*)
     UNSUPPORTED=1
@@ -56,19 +56,4 @@ case "${target}" in
 esac
 
 # Disable libcilkrts on non POSIX hosted systems.
-if test x$enable_libcilkrts = x ; then
-    # Enable libcilkrts by default on hosted POSIX systems.
-    case "${target}" in
-    *-*-linux* | *-*-gnu* | *-*-k*bsd*-gnu | *-*-kopensolaris*-gnu)
-        ;;
-    *-*-netbsd* | *-*-freebsd* | *-*-openbsd* | *-*-dragonfly*)
-        ;;
-    *-*-solaris2* | *-*-hpux11*)
-        ;;
-    *-*-darwin* | *-*-aix*)
-        ;;
-    *)
-        UNSUPPORTED=1
-        ;;
-    esac
-fi
+. ${srcdir}/../config/target-posix

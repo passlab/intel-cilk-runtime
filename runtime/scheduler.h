@@ -2,7 +2,7 @@
  *
  *************************************************************************
  *
- *  Copyright (C) 2009-2015, Intel Corporation
+ *  Copyright (C) 2009-2016, Intel Corporation
  *  All rights reserved.
  *  
  *  Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@
  *  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
  *  time that a new version is released. Changes only submitted to the
  *  GNU compiler collection or posted to the git repository at
- *  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+ *  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
  *  not tracked.
  *  
  *  We welcome your contributions to this open source project. Thank you
@@ -85,7 +85,10 @@ __CILKRTS_BEGIN_EXTERN_C
  * Print debugging messages and assertions for parallel reducers. 0 is
  * no debugging.  A higher value generates more output.
  */
+
+#ifndef REDPAR_DEBUG
 #define REDPAR_DEBUG 0
+#endif
 
 /**
  * @brief Lock the worker mutex to allow exclusive access to the

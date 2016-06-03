@@ -1,4 +1,4 @@
-/* jmpbuf.c                  -*-C-*-
+/* os.h                  -*-C++-*-
  *
  *************************************************************************
  *
@@ -47,13 +47,18 @@
  *  for your assistance in helping us improve Cilk Plus.
  **************************************************************************/
 
-#include "jmpbuf.h"
+// GCC before 4.4 does not implement __sync_synchronize properly
+#define HAVE_SYNC_INTRINSICS defined(__GNUC__) && \
+                             (__GNUC__ * 10 + __GNUC_MINOR__ >= 44)
 
 /*
- * C99 requires that every inline function with external linkage have
- * one extern declaration in the program.
+ * void __cilkrts_fence(void)
  */
-extern char *__cilkrts_get_sp(__cilkrts_stack_frame *sf);
-extern ptrdiff_t __cilkrts_get_frame_size(__cilkrts_stack_frame *sf);
 
-/* End jmpbuf.c */
+#if HAVE_SYNC_INTRINSICS
+#   define __cilkrts_fence() __sync_synchronize()
+#elif defined(__GNUC__)
+#   define __cilkrts_fence() __asm__ volatile ("membar #StoreLoad" ::: "memory")
+#else
+COMMON_SYSDEP void __cilkrts_fence(void);
+#endif

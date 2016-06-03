@@ -36,7 +36,7 @@
 #  http://www.cilkplus.org/submit-cilk-contribution will be lost the next
 #  time that a new version is released. Changes only submitted to the
 #  GNU compiler collection or posted to the git repository at
-#  https://bitbucket.org/intelcilkplusruntime/itnel-cilk-runtime.git are
+#  https://bitbucket.org/intelcilkruntime/itnel-cilk-runtime.git are
 #  not tracked.
 #  
 #  We welcome your contributions to this open source project. Thank you
