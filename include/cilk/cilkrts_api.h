@@ -66,13 +66,20 @@ static int __cilkrts_dummy = 8;
         (sf).worker = (__cilkrts_worker*) alloca(__cilkrts_dummy);    \
 } while (0)
 
+/**
+ * NOTE: Not sure the reason, the use of __builtin_expect is not only for optimization when using with GCC, but to
+ * make it sure that the code does not into bug.
+ */
+#define __CILKRTS_SAVE_FP(sf) __cilkrts_save_fp_ctrl_state(&__stack_frame__)
+
 #define __CILKRTS_POP_FRAME(__stack_frame__) do {                       \
     __stack_frame__.worker->current_stack_frame = __stack_frame__.call_parent;   \
     __stack_frame__.call_parent = 0;                                  \
 } while (0)
 
 /**
- * The SPAWN_HELPER_PROLOG/EIPLOG must be inside the task function enclosing all the statements of the task function.
+ * The SPAWN_HELPER_PROLOG/EIPLOG are macros used by the helper function of a task. 
+ * They must be inside the helper function before and after the invocation of the task function.
  */
 #define CILKRTS_SPAWN_HELPER_PROLOG(__parent_frame__)                     \
     struct __cilkrts_stack_frame __stack_frame__;       \
@@ -83,42 +90,12 @@ static int __cilkrts_dummy = 8;
     __cilkrts_leave_frame(&__stack_frame__);              \
     trace_printf("left frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self)
 
-
 /**
- * CILKRTS_FUNCTION_PROLOG: MUST be called in the top-level scope of the function and 
- * before the first spawning call in a function, i.e.
- * the lexical scope of the call must enclose all the spawn call.
+ * CILKRTS_FUNCTION_PROLOG/EPILOG are macros used by function that makes any cilk related calls. Each should
+ * be invoked only once in each function's invocation. 
  *
- * CILKRTS_FUNCTION_EPILOG: SHOULD be called after the last spawn call (before a return).
- * If an CILKRTS_SYNC is not called before CILKRTS_FUNCTION_EPILOG, CILKRTS_SYNC MUST be explicitly called.
- *
- */
-
-/**
- * NOTE: Not sure the reason, the use of __builtin_expect is not only for optimization when using with GCC, but to
- * make it sure that the code does not into bug.
- */
-
-#define __CILKRTS_SAVE_FP(sf) __cilkrts_save_fp_ctrl_state(&__stack_frame__)
-
-/**
- * This is the macro for spawning a task using task_func
- *
- * The first parameter of the task function must be __cilkrts_stack_frame *, which is the parent_frame of the spawned task
- * The task function does not need to use that parent_frame pointer at all.
- *
- */
-#define CILKRTS_SPAWN_WITH_HELP(task_func, ...) do { \
-    __CILKRTS_SAVE_FP(__stack_frame__);             \
-    if (__builtin_expect(! CILK_SETJMP(__stack_frame__.ctx), 1)) {        \
-        task_func(&__stack_frame__, __VA_ARGS__);                                                     \
-    } else {                                                              \
-        trace_printf("continutation entry after being stolen by %p(W%d)\n", __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self); \
-    }                   \
-} while (0)
-
-/**
- * Must be called before any call to rex_cilkrts macros
+ * CILKRTS_FUNCTION_PROLOG must be called before the first invocation of CILKRTS_SPAWN, CILKRTS_SYNC, 
+ * or other __cilkrts related runtime routine. It should be invoked only once in one function. 
  */
 #define CILKRTS_FUNCTION_PROLOG()                                           \
     struct __cilkrts_stack_frame __stack_frame__;                   \
@@ -127,7 +104,8 @@ static int __cilkrts_dummy = 8;
     trace_printf("spawnning frame entered: %p by %p(w%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self)
 
 /**
- * must be called after the last call to rex_cilkrts macros.
+ * Must be called after the last invocation of CILKRTS_SPAWN, CILKRTS_SYNC, or other __cilkrts related runtime routine
+ * It should be invoked only once in one function. 
  */
 #define CILKRTS_FUNCTION_EPILOG() do {                                      \
     __CILKRTS_POP_FRAME(__stack_frame__);                                 \
@@ -138,7 +116,24 @@ static int __cilkrts_dummy = 8;
 } while (0)
 
 /**
- * this is the same as cilk_sync
+ * This macro provide cilk_spawn functionality, i.e. for spawning a task using helper function of the task.
+ * The first parameter of the helper function must be __cilkrts_stack_frame *, 
+ * which is the parent_frame of the spawned task. The rest parameters are the parameters/arguments for the task. 
+ * The body of the helper function must start with CILKRTS_SPAWN_HELPER_PROLOG and ends with CILKRTS_SPAWN_HELPER_EPILOG. 
+ *
+ */
+#define CILKRTS_SPAWN(helper_func, ...) do { \
+    __CILKRTS_SAVE_FP(__stack_frame__);             \
+    if (__builtin_expect(! CILK_SETJMP(__stack_frame__.ctx), 1)) {        \
+        helper_func(&__stack_frame__, __VA_ARGS__);                                                     \
+    } else {                                                              \
+        trace_printf("continutation entry after being stolen by %p(W%d)\n", __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self); \
+    }                   \
+} while (0)
+
+/**
+ * This macro is the same as cilk_sync
+ * If an CILKRTS_SYNC is not called before CILKRTS_FUNCTION_EPILOG, CILKRTS_SYNC MUST be explicitly called.
  */
 #define CILKRTS_SYNC() do {                       \
     __stack_frame__.parent_pedigree = __stack_frame__.worker->pedigree;    \

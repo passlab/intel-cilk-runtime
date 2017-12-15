@@ -39,7 +39,8 @@ int fib(int n) {
     CILKRTS_FUNCTION_PROLOG();
     int a, b;
 
-    CILKRTS_SPAWN_WITH_HELP(fib_spawn_helper, &a, n);
+    CILKRTS_SPAWN(fib_spawn_helper, &a, n);
+
     b = fib(n - 2);
     CILKRTS_SYNC();
 
