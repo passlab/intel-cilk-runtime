@@ -140,6 +140,7 @@ nodist_cilkinclude_HEADERS =       \
   include/cilk/cilk.h              \
   include/cilk/cilk_stub.h         \
   include/cilk/cilk_undocumented.h \
+  include/cilk/cilkrts_api.h       \
   include/cilk/common.h            \
   include/cilk/holder.h            \
   include/cilk/hyperobject_base.h  \
