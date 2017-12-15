@@ -32,8 +32,8 @@
 #ifndef __SAFE_STR_CONSTRAINT_H__
 #define __SAFE_STR_CONSTRAINT_H__
 
+#include <wchar.h>
 #include "safeclib_private.h"
-
 /*
  * Function used by the libraries to invoke the registered
  * runtime-constraint handler. Always needed.

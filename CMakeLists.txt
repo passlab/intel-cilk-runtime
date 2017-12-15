@@ -108,7 +108,7 @@ endif()
 set(cilkrts_srcs
     runtime/bug.cpp
     runtime/cilk-abi.c
-    runtime/cilk-abi-cilk-for.cpp
+#    runtime/cilk-abi-cilk-for.cpp
     runtime/cilk-abi-vla-internal.c
     runtime/cilk_api.c
     runtime/cilk_fiber.cpp
@@ -239,6 +239,7 @@ else()
         -DHAVE_ATTRIBUTE_VISIBILITY
         -DHAVE_PTHREAD_AFFINITY_NP
         -DDONT_USE_CPU_ALLOC_SIZE
+	-DUSE_CILK_API
     )
     # OS-dependent flags
     if(${APPLE})
@@ -259,14 +260,14 @@ else()
     )
     # -fcilkplus is required when using GCC/LLVM
     if(NOT "${CMAKE_C_COMPILER_ID}" STREQUAL "Intel")
-        set_property(SOURCE runtime/cilk-abi.c
-                            runtime/cilk-abi-cilk-for.cpp
-                            runtime/cilk_api.c
-                            runtime/global_state.cpp
-                            runtime/reducer_impl.cpp
-                            runtime/scheduler.c
-                     APPEND PROPERTY COMPILE_FLAGS -fcilkplus
-        )
+#        set_property(SOURCE runtime/cilk-abi.c
+#                            runtime/cilk-abi-cilk-for.cpp
+#                            runtime/cilk_api.c
+#                            runtime/global_state.cpp
+#                            runtime/reducer_impl.cpp
+#                            runtime/scheduler.c
+#                     APPEND PROPERTY COMPILE_FLAGS -fcilkplus
+#        )
     endif()
     # Link flags
     if(${APPLE})
@@ -341,6 +342,8 @@ endif()
 
 # Install headers and libraries
 install(DIRECTORY ${CilkRuntime_SOURCE_DIR}/include/cilk
+                  ${CilkRuntime_SOURCE_DIR}/include/internal
+                 ${CilkRuntime_SOURCE_DIR}/include/cilktools
         DESTINATION include
         FILES_MATCHING PATTERN "*.h"
 )
