@@ -158,6 +158,17 @@ nodist_cilkinclude_HEADERS =       \
   include/cilk/reducer_ostream.h   \
   include/cilk/reducer_string.h
 
+internalincludedir = $(includedir)/internal
+internalinclude_HEADERS =          \   
+  include/internal/abi.h           \   
+  include/internal/cilk_version.h  \
+  include/internal/metacall.h 
+
+cilktoolsincludedir = $(includedir)/cilktools
+cilktoolsinclude_HEADERS =         \   
+  include/cilktools/cilkscreen.h   \   
+  include/cilktools/cilkview.h     \   
+  include/cilktools/lock_guard.h
 
 # Work around what appears to be a GNU make bug handling MAKEFLAGS
 # values defined in terms of make variables, as is the case for CC and

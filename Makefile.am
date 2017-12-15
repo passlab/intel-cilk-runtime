@@ -138,6 +138,7 @@ cilkinclude_HEADERS =              \
   include/cilk/cilk.h              \
   include/cilk/cilk_stub.h         \
   include/cilk/cilk_undocumented.h \
+  include/cilk/cilkrts_api.h       \
   include/cilk/common.h            \
   include/cilk/holder.h            \
   include/cilk/hyperobject_base.h  \
@@ -154,4 +155,17 @@ cilkinclude_HEADERS =              \
   include/cilk/reducer_opor.h      \
   include/cilk/reducer_opxor.h     \
   include/cilk/reducer_ostream.h   \
-  include/cilk/reducer_string.h
+  include/cilk/reducer_string.h	   
+
+internalincludedir = $(includedir)/internal
+internalinclude_HEADERS =          \
+  include/internal/abi.h           \
+  include/internal/cilk_version.h  \
+  include/internal/metacall.h
+
+cilktoolsincludedir = $(includedir)/cilktools
+cilktoolsinclude_HEADERS =         \
+  include/cilktools/cilkscreen.h   \
+  include/cilktools/cilkview.h     \
+  include/cilktools/lock_guard.h
+
