@@ -63,14 +63,6 @@
 
 #ifndef CILK_STUB /* Real (non-stub) definitions */
 
-#if ! defined(__cilk) && ! defined(USE_CILK_API)
-#   ifdef _WIN32
-#       error Cilk API is being used with non-Cilk compiler (or Cilk is disabled)
-#   else
-#       warning Cilk API is being used with non-Cilk compiler (or Cilk is disabled)
-#   endif
-#endif
-
 #include <cilk/common.h>
 
 #ifdef __cplusplus

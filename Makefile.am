@@ -54,9 +54,6 @@ ACLOCAL_AMFLAGS = -I m4
 GENERAL_FLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/runtime -I$(top_srcdir)/runtime/config/$(config_dir) -I$(top_srcdir)/runtime/sslib -DIN_CILK_RUNTIME=1
 GENERAL_FLAGS += -fpic -O3
 
-# Enable Intel Cilk Plus extension
-GENERAL_FLAGS += -fcilkplus
-
 #Always generate unwind tables
 GENERAL_FLAGS += -funwind-tables
 
@@ -85,7 +82,6 @@ libcilkrts_la_SOURCES =            \
   runtime/sslib/strnlen_s.c           \
   runtime/bug.cpp                  \
   runtime/cilk-abi.c               \
-  runtime/cilk-abi-cilk-for.cpp    \
   runtime/cilk-abi-vla-internal.c  \
   runtime/cilk_api.c               \
   runtime/cilk_fiber.cpp           \
