@@ -1,5 +1,18 @@
-#ifndef __REX_REX_CILKPLUS_H__
-#define __REX_REX_CILKPLUS_H__
+/**
+ *  This file provide macros for using cilkrts without using spawn/sync and a compiler
+ *  that support Cilkplus.  
+ *  
+ *  Created by Yonghong Yan (yanyh15@) and based on the cilk_fake.h file. 
+ *  
+ *  Check test/fib_cilkrts_api.c file for how to use it. With those macros, 
+ *  a source to source compiler such as based on ROSE, or simple scripting can be easily 
+ *  created to support cilk/cilkplus spawn/sync paralellism
+ *  
+ *  This file and those in test are BSD-licensed. 
+ */
+
+#ifndef __REX_CILKPLUS_H__
+#define __REX_CILKPLUS_H__
 
 #include <alloca.h>
 
@@ -144,4 +157,4 @@ static int __cilk_fake_dummy = 8;
     __stack_frame__.worker->pedigree.rank++;                        \
 } while (0)
 
-#endif //__REX_REX_CILKPLUS_H__
+#endif //__REX_CILKPLUS_H__

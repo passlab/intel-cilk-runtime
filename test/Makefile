@@ -2,12 +2,17 @@
 CILKRTS_PATH=../../intel-cilk-runtime-install
 
 INCLUDE_FLAGS = -I${CILKRTS_PATH}/include
-LIB_FLAGS = -L${CILKRTS_PATH}/lib -lcilkrts
+LIB_FLAGS = -L${CILKRTS_PATH}/lib -lcilkrts -ldl
 
 GCC=gcc
 #GCC=/opt/gcc-5.3.0-install/bin/gcc
 ICC=icc
 
+# when run those fib example, make sure you use the installed libcilkrts.so file, 
+# not the system one that comes with either intel or gcc compiler. 
+# check using ldd
+# set through export LD_LIBRARY_PATH=
+#
 fib: fib_serial fib_cilkrts_api fib_cilkplus
 
 fib_serial: fib_serial.c
@@ -23,4 +28,4 @@ fib_cilkplus: fib_cilkplus.c
 	icc $< -o $@-icc
 
 clean:
-	rm -rf ${OBJS} fib *.log
+	rm -rf fib_serial-* I fib_cilkrts_api-* fib_cilkplus-* *.o core
