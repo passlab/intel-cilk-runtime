@@ -11,8 +11,8 @@
  *  This file and those in test are BSD-licensed. 
  */
 
-#ifndef __REX_CILKPLUS_H__
-#define __REX_CILKPLUS_H__
+#ifndef __CILKRTS_API_H__
+#define __CILKRTS_API_H__
 
 #include <alloca.h>
 
@@ -20,7 +20,7 @@
 #include <internal/abi.h>
 #include <cilk/cilk_api.h>
 
-#define CILK_FAKE_VERSION_FLAG (__CILKRTS_ABI_VERSION << 24)
+#define __CILKRTS_VERSION_FLAG (__CILKRTS_ABI_VERSION << 24)
 //#define trace_printf(...) printf(__VA_ARGS__)
 #define trace_printf(...)
 
@@ -32,7 +32,7 @@
     __cilkrts_worker *w = parent_frame->worker;
     sf->call_parent = parent_frame;
     sf->worker      = w;
-    sf->flags       = CILK_FAKE_VERSION_FLAG;
+    sf->flags       = __CILKRTS_VERSION_FLAG;
     w->current_stack_frame = sf;
 
     trace_printf("helper frame entered: %p by %p(W%d)\n", sf, w, w->self);
@@ -53,25 +53,20 @@
     trace_printf("frame detached: %p by %p(W%d)\n", parent_frame, w, w->self);
 }
 
-/* This variable is used in CILK_REX_FORCE_FRAME_PTR(), below */
-static int __cilk_fake_dummy = 8;
+/* This variable is used in __CILKRTS_FORCE_FRAME_PTR(), below */
+static int __cilkrts_dummy = 8;
 
 /* The following macro is used to force the compiler into generating a frame
- * pointer.  We never change the value of __cilk_fake_dummy, so the alloca()
- * is never called, but we need the 'if' statement and the __cilk_fake_dummy
+ * pointer.  We never change the value of __cilkrts_dummy, so the alloca()
+ * is never called, but we need the 'if' statement and the __cilkrts_dummy
  * variable so that the compiler does not attempt to optimize it away.
  */
-#define CILK_FAKE_FORCE_FRAME_PTR(sf) do {                              \
-    if (__builtin_expect(1 & __cilk_fake_dummy, 0))                     \
-        (sf).worker = (__cilkrts_worker*) alloca(__cilk_fake_dummy);    \
+#define __CILKRTS_FORCE_FRAME_PTR(sf) do {                              \
+    if (__builtin_expect(1 & __cilkrts_dummy, 0))                     \
+        (sf).worker = (__cilkrts_worker*) alloca(__cilkrts_dummy);    \
 } while (0)
 
-#define CILK_PUSH_FRAME(__stack_frame__) do {                       \
-    __stack_frame__.worker->current_stack_frame = __stack_frame__.call_parent;   \
-    __stack_frame__.call_parent = 0;                                  \
-} while (0)
-
-#define CILK_POP_FRAME(__stack_frame__) do {                       \
+#define __CILKRTS_POP_FRAME(__stack_frame__) do {                       \
     __stack_frame__.worker->current_stack_frame = __stack_frame__.call_parent;   \
     __stack_frame__.call_parent = 0;                                  \
 } while (0)
@@ -79,24 +74,24 @@ static int __cilk_fake_dummy = 8;
 /**
  * The SPAWN_HELPER_PROLOG/EIPLOG must be inside the task function enclosing all the statements of the task function.
  */
-#define REX_SPAWN_HELPER_PROLOG(__parent_frame__)                     \
+#define CILKRTS_SPAWN_HELPER_PROLOG(__parent_frame__)                     \
     struct __cilkrts_stack_frame __stack_frame__;       \
     __cilkrts_enter_frame_detach_parent(&__stack_frame__, (__cilkrts_stack_frame*)__parent_frame__)
 
-#define REX_SPAWN_HELPER_EPILOG()                                   \
-    CILK_POP_FRAME(__stack_frame__);                                         \
+#define CILKRTS_SPAWN_HELPER_EPILOG()                                   \
+    __CILKRTS_POP_FRAME(__stack_frame__);                                         \
     __cilkrts_leave_frame(&__stack_frame__);              \
     trace_printf("left frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self)
 
 
 /**
- * REX_FUNCTION_PROLOG: MUST be called in the top-level scope of the function and before the first spawning call in a function, i.e.
+ * CILKRTS_FUNCTION_PROLOG: MUST be called in the top-level scope of the function and 
+ * before the first spawning call in a function, i.e.
  * the lexical scope of the call must enclose all the spawn call.
  *
- * REX_FUNCTION_EPILOG: SHOULD be called after the last spawn call (before a return).
- * If an REX_SYNC is not called before REX_FUNCTION_EPILOG, REX_SYNC MUST be explicitly called.
+ * CILKRTS_FUNCTION_EPILOG: SHOULD be called after the last spawn call (before a return).
+ * If an CILKRTS_SYNC is not called before CILKRTS_FUNCTION_EPILOG, CILKRTS_SYNC MUST be explicitly called.
  *
- * REX_PARALLEL has its own REX_SYNC
  */
 
 /**
@@ -104,7 +99,7 @@ static int __cilk_fake_dummy = 8;
  * make it sure that the code does not into bug.
  */
 
-#define CILK_FAKE_SAVE_FP(sf) __cilkrts_save_fp_ctrl_state(&__stack_frame__)
+#define __CILKRTS_SAVE_FP(sf) __cilkrts_save_fp_ctrl_state(&__stack_frame__)
 
 /**
  * This is the macro for spawning a task using task_func
@@ -113,8 +108,8 @@ static int __cilk_fake_dummy = 8;
  * The task function does not need to use that parent_frame pointer at all.
  *
  */
-#define REX_SPAWN_WITH_HELP(task_func, ...) do { \
-    CILK_FAKE_SAVE_FP(__stack_frame__);             \
+#define CILKRTS_SPAWN_WITH_HELP(task_func, ...) do { \
+    __CILKRTS_SAVE_FP(__stack_frame__);             \
     if (__builtin_expect(! CILK_SETJMP(__stack_frame__.ctx), 1)) {        \
         task_func(&__stack_frame__, __VA_ARGS__);                                                     \
     } else {                                                              \
@@ -125,18 +120,18 @@ static int __cilk_fake_dummy = 8;
 /**
  * Must be called before any call to rex_cilkrts macros
  */
-#define REX_FUNCTION_PROLOG()                                           \
+#define CILKRTS_FUNCTION_PROLOG()                                           \
     struct __cilkrts_stack_frame __stack_frame__;                   \
-    CILK_FAKE_FORCE_FRAME_PTR(__stack_frame__);                     \
+    __CILKRTS_FORCE_FRAME_PTR(__stack_frame__);                     \
     __cilkrts_enter_frame_1(&__stack_frame__);                    \
     trace_printf("spawnning frame entered: %p by %p(w%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self)
 
 /**
  * must be called after the last call to rex_cilkrts macros.
  */
-#define REX_FUNCTION_EPILOG() do {                                      \
-    CILK_POP_FRAME(__stack_frame__);                                 \
-    if (__stack_frame__.flags != CILK_FAKE_VERSION_FLAG)  {             \
+#define CILKRTS_FUNCTION_EPILOG() do {                                      \
+    __CILKRTS_POP_FRAME(__stack_frame__);                                 \
+    if (__stack_frame__.flags != __CILKRTS_VERSION_FLAG)  {             \
         trace_printf("to leave frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self);      \
         __cilkrts_leave_frame(&__stack_frame__);                       \
     } \
@@ -145,10 +140,10 @@ static int __cilk_fake_dummy = 8;
 /**
  * this is the same as cilk_sync
  */
-#define REX_SYNC() do {                       \
+#define CILKRTS_SYNC() do {                       \
     __stack_frame__.parent_pedigree = __stack_frame__.worker->pedigree;    \
     if (__builtin_expect(__stack_frame__.flags & CILK_FRAME_UNSYNCHED, 0)) {                           \
-        CILK_FAKE_SAVE_FP(__stack_frame__);            \
+        __CILKRTS_SAVE_FP(__stack_frame__);            \
         if (CILK_SETJMP(__stack_frame__.ctx) == 0)   {         \
             trace_printf("to sync frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self);        \
             __cilkrts_sync(&__stack_frame__);                       \
@@ -157,4 +152,4 @@ static int __cilk_fake_dummy = 8;
     __stack_frame__.worker->pedigree.rank++;                        \
 } while (0)
 
-#endif //__REX_CILKPLUS_H__
+#endif //__CILKPLUS_API_H__

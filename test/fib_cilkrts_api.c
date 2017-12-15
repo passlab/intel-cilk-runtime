@@ -24,9 +24,9 @@ int fib(int n);
 
 void fib_spawn_helper(void * parent_frame, int* a, int n)
 {
-    REX_SPAWN_HELPER_PROLOG(parent_frame);
+    CILKRTS_SPAWN_HELPER_PROLOG(parent_frame);
     *a = fib(n - 1);
-    REX_SPAWN_HELPER_EPILOG();
+    CILKRTS_SPAWN_HELPER_EPILOG();
 }
 
 int fib(int n) {
@@ -36,14 +36,14 @@ int fib(int n) {
     if (n < 2)
         return n;
 
-    REX_FUNCTION_PROLOG();
+    CILKRTS_FUNCTION_PROLOG();
     int a, b;
 
-    REX_SPAWN_WITH_HELP(fib_spawn_helper, &a, n);
+    CILKRTS_SPAWN_WITH_HELP(fib_spawn_helper, &a, n);
     b = fib(n - 2);
-    REX_SYNC();
+    CILKRTS_SYNC();
 
-    REX_FUNCTION_EPILOG();
+    CILKRTS_FUNCTION_EPILOG();
     return a + b;
 }
 
