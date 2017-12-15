@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "cilkrts_api.h"
+#include <cilk/cilkrts_api.h>
 
 double read_timer_ms() {
     struct timeval t;
