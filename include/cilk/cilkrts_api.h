@@ -27,9 +27,9 @@
 /* Called from the spawn helper to push the parent continuation on the task
  * deque so that it can be stolen.
  */
-/* __CILKRTS_INLINE */ void __cilkrts_enter_frame_detach_parent(__cilkrts_stack_frame *sf, __cilkrts_stack_frame * parent_frame)
+/* __CILKRTS_INLINE */ void __cilkrts_enter_frame_detach_parent(__cilkrts_worker *w, __cilkrts_stack_frame *sf,
+                                                                __cilkrts_stack_frame * parent_frame)
 {
-    __cilkrts_worker *w = parent_frame->worker;
     sf->call_parent = parent_frame;
     sf->worker      = w;
     sf->flags       = __CILKRTS_VERSION_FLAG;
@@ -82,8 +82,9 @@ static int __cilkrts_dummy = 8;
  * They must be inside the helper function before and after the invocation of the task function.
  */
 #define CILKRTS_SPAWN_HELPER_PROLOG(__parent_frame__)                     \
-    struct __cilkrts_stack_frame __stack_frame__;       \
-    __cilkrts_enter_frame_detach_parent(&__stack_frame__, (__cilkrts_stack_frame*)__parent_frame__)
+    struct __cilkrts_stack_frame __stack_frame__;                         \
+    __cilkrts_worker *__worker__ = ((__cilkrts_stack_frame*)__parent_frame__)->worker;                  \
+    __cilkrts_enter_frame_detach_parent(__worker__, &__stack_frame__, (__cilkrts_stack_frame*)__parent_frame__)
 
 #define CILKRTS_SPAWN_HELPER_EPILOG()                                   \
     __CILKRTS_POP_FRAME(__stack_frame__);                                         \
