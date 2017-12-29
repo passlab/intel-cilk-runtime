@@ -1,14 +1,13 @@
 /**
- *  This file provide macros for using cilkrts without using spawn/sync and a compiler
+ * @file cilkrts_api.h
+ *
+ * @brief This file provide macros for using cilkrts without using spawn/sync and a compiler
  *  that support Cilkplus.  
  *  
- *  Created by Yonghong Yan (yanyh15@) and based on the cilk_fake.h file. 
+ * @author Yonghong Yan (yanyh15@) and based on the cilk_fake.h file.
  *  
- *  Check test/fib_cilkrts_api.c file for how to use it. With those macros, 
- *  a source to source compiler such as based on ROSE, or simple scripting can be easily 
- *  created to support cilk/cilkplus spawn/sync paralellism
- *  
- *  This file and those in test are BSD-licensed. 
+ * Check test/fib_cilkrts_api.c file for how to use it.
+ * This file and those in test are BSD-licensed.
  */
 
 #ifndef __CILKRTS_API_H__
@@ -79,7 +78,7 @@ static int __cilkrts_dummy = 8;
 
 /**
  * The SPAWN_HELPER_PROLOG/EIPLOG are macros used by the helper function of a task. 
- * They must be inside the helper function before and after the invocation of the task function.
+ * They must be inside the helper function, called before and after the invocation of the task function.
  */
 #define CILKRTS_SPAWN_HELPER_PROLOG(__parent_frame__)                     \
     struct __cilkrts_stack_frame __stack_frame__;                         \
@@ -148,4 +147,4 @@ static int __cilkrts_dummy = 8;
     __stack_frame__.worker->pedigree.rank++;                        \
 } while (0)
 
-#endif //__CILKPLUS_API_H__
+#endif //__CILKRTS_API_H__
