@@ -285,6 +285,11 @@ else()
     endif()
 endif()
 
+# set the compiler flag for REX_CILKRTS_SUPPORT
+if(${REX_CILKRTS_SUPPORT})
+    list(APPEND cilk_flags -DREX_CILKRTS_SUPPORT=1)
+endif()
+
 # Override the default flags for Windows build.
 if(${WIN32})
     set(CMAKE_C_FLAGS_RELEASE "/MT /O2 /Ob2 /DNDEBUG")
@@ -307,7 +312,6 @@ endforeach()
 foreach(f ${cilk_link_flags})
     set(final_link_flags "${final_link_flags} ${f}")
 endforeach()
-
 
 ################################################################################
 # Target definitions
