@@ -2,7 +2,7 @@
 CILKRTS_PATH=../../intel-cilk-runtime-install
 
 INCLUDE_FLAGS = -I${CILKRTS_PATH}/include
-LIB_FLAGS = -L${CILKRTS_PATH}/lib -lcilkrts -ldl
+LIB_FLAGS = -L${CILKRTS_PATH}/lib -lcilkrts -ldl -fuse-ld=gold
 
 GCC=gcc
 #GCC=/opt/gcc-5.3.0-install/bin/gcc
