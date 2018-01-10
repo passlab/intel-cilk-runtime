@@ -60,7 +60,7 @@
 #include "cilk_malloc.h"
 #include "reducer_impl.h"
 #include "metacall_impl.h"
-
+#include "scheduler.h"
 
 // On x86 processors (but not MIC processors), the compiler generated code to
 // save the FP state (rounding mode and the like) before calling setjmp.  We
@@ -174,7 +174,18 @@ static void internal_run_scheduler_with_exceptions(__cilkrts_worker *w)
 NON_COMMON void* scheduler_thread_proc_for_system_worker(void *arg)
 {
     /*int status;*/
-    __cilkrts_worker *w = (__cilkrts_worker *)arg;
+    __cilkrts_worker *w;
+    worker_thread_arg_t* thread_arg = (struct worker_thread_arg*)arg;
+    global_state_t * g = thread_arg->g;
+    w = allocate_make_worker(g, thread_arg->self);
+
+    /* make_worker_systems */
+    w->l->type = WORKER_SYSTEM;
+    w->l->signal_node = signal_node_create();
+
+    /* publish itself to the global*/
+    g->workers[w->self] = w;
+    __cilkrts_fence();
 
 #ifdef __INTEL_COMPILER
 #ifdef USE_ITTNOTIFY
@@ -271,7 +282,7 @@ static void create_threads(global_state_t *g, int base, int top)
         int status = pthread_create(&g->sysdep->threads[i],
                                     NULL,
                                     scheduler_thread_proc_for_system_worker,
-                                    g->workers[i]);
+                                    &g->worker_thread_args[i]);
         if (status != 0)
             __cilkrts_bug("Cilk runtime error: thread creation (%d) failed: %d\n", i, status);
     }
@@ -284,7 +295,7 @@ static int volatile threads_created = 0;
 // ourselves.
 static void * create_threads_and_work (void * arg)
 {
-    global_state_t *g = ((__cilkrts_worker *)arg)->g;
+    global_state_t *g = ((worker_thread_arg_t *)arg)->g;
 
     create_threads(g, g->P/2, g->P-1);
     // Let the initial thread know that we're done.
@@ -311,7 +322,7 @@ void __cilkrts_start_workers(global_state_t *g, int n)
             int half_threads = (n+1)/2;
         
             // Create the first thread passing a different thread function, so that it creates threads itself
-            status = pthread_create(&g->sysdep->threads[0], NULL, create_threads_and_work, g->workers[0]);
+            status = pthread_create(&g->sysdep->threads[0], NULL, create_threads_and_work, &g->worker_thread_args[0]);
 
             if (status != 0)
                 __cilkrts_bug("Cilk runtime error: thread creation (0) failed: %d\n", status);

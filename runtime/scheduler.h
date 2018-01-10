@@ -300,23 +300,17 @@ void __cilkrts_restore_stealing(
     __cilkrts_stack_frame *volatile *saved_protected_tail);
 
 /**
- * @brief Initialize a @c __cilkrts_worker.
- *
- * @note The memory for the worker must have been allocated outside
- * this call.
+ * @brief Allocate and initialize a @c __cilkrts_worker.
  *
  * @param g The global_state_t.
  * @param self The index into the global_state's array of workers for this
  * worker, or -1 if this worker was allocated from the heap and cannot be
  * stolen from.
- * @param w The worker to be initialized.
  *
  * @return The initialized __cilkrts_worker.
  */
 COMMON_PORTABLE
-__cilkrts_worker *make_worker(global_state_t *g,
-                              int self,
-                              __cilkrts_worker *w);
+__cilkrts_worker *allocate_make_worker(global_state_t *g, int self);
 
 /**
  * @brief Free up any resources allocated for a worker.

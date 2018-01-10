@@ -364,7 +364,7 @@ __cilkrts_get_sf(void)
     return w->current_stack_frame;
 }
 
-/* Call with global lock held */
+/* Call with global lock held, called in from user code */
 static __cilkrts_worker *find_free_worker(global_state_t *g)
 {
     __cilkrts_worker *w = 0;
@@ -374,19 +374,19 @@ static __cilkrts_worker *find_free_worker(global_state_t *g)
     // use it.
     for (i = g->P - 1; i < g->total_workers; ++i) {
         w = g->workers[i];
-        CILK_ASSERT(WORKER_SYSTEM != w->l->type);
-        if (w->l->type == WORKER_FREE) {
-            w->l->type = WORKER_USER;
-            w->l->team = w;
-            return w;
+        if (w != NULL) { /* the worker thread may not yet publish its worker object */
+            CILK_ASSERT(WORKER_SYSTEM != w->l->type);
+            if (w->l->type == WORKER_FREE) {
+                w->l->type = WORKER_USER;
+                w->l->team = w;
+                return w;
+            }
         }
     }
 
     // If we ran out of workers, create a new one.  It doesn't actually belong
     // to the Cilk global state so nobody will ever try to steal from it.
-    w = (__cilkrts_worker *)__cilkrts_malloc(sizeof(*w));
-    __cilkrts_cilkscreen_ignore_block(w, w+1);
-    make_worker(g, -1, w);
+    w = allocate_make_worker(g, -1);
     w->l->type = WORKER_USER;
     w->l->team = w;
     return w;

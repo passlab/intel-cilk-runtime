@@ -158,6 +158,9 @@ struct global_state_t { /* COMMON_PORTABLE */
     /// Array of worker structures.
     __cilkrts_worker **workers;
 
+    /// Array of worker_thread_args used to pass each worker thread for initialization
+    worker_thread_arg_t * worker_thread_args;
+
     /******* END OF DEBUGGER-INTEGRATION FIELDS ***************/
 
     /// Number of frames in each worker's lazy task queue

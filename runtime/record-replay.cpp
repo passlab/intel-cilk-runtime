@@ -671,14 +671,12 @@ void scan_for_matching_steals(global_state_t *g, replay_entry_t *entry)
     }
 }
 
-
 /*
  * Initialize per-worker data for record or replay - See record-replay.h
  * for full routine header.
  */
-void replay_init_workers(global_state_t *g)
+void replay_init_worker(__cilkrts_worker* w, global_state_t *g)
 {
-    int i;
     char worker_file_name[512];
 
     // If we're not recording or replaying a log, we're done.  All of the
@@ -687,57 +685,46 @@ void replay_init_workers(global_state_t *g)
     if (RECORD_REPLAY_NONE == g->record_or_replay)
         return;
 
-    // If we're replaying a log, read each worker's log and construct the
+    // If we're replaying a log, read worker's log and construct the
     // in-memory log
     if (REPLAY_LOG == g->record_or_replay)
     {
-        // Read all of the data
-        for (i = 0; i < g->total_workers; ++i)
-        {
-            // This function will also initialize and fill the worker's 
-            // replay list
-            load_recorded_log(g->workers[i]);
-        }
+        // This function will also initialize and fill the worker's
+        // replay list
+        load_recorded_log(w);
 
         // Scan for orphans with no matching steal.  Mark them so they'll be
         // skipped as we advance through the log.
-        for (i = 0; i < g->total_workers; ++i)
-        {
-            scan_for_matching_steals(g, g->workers[i]->l->replay_list_root);
-        }
+        scan_for_matching_steals(g, w->l->replay_list_root);
 
         // If we're recording the logs while replaying, create the log files.
         // This will only be used for debugging.  Create the logs in the
         // current directory.  It should be as good a place as any...
 #if RECORD_ON_REPLAY
-        for(i = 0; i < g->total_workers; ++i)
-        {
-            __cilkrts_worker *w = g->workers[i];
-            cilk_snprintf_i(worker_file_name, sizeof(worker_file_name),
-                            "replay_log_%d.cilklog",  w->self);
-            w->l->record_replay_fptr = fopen(worker_file_name, "w+");
-            CILK_ASSERT(NULL != w->l->record_replay_fptr);
-        }
+        cilk_snprintf_i(worker_file_name, sizeof(worker_file_name),
+                        "replay_log_%d.cilklog",  w->self);
+        w->l->record_replay_fptr = fopen(worker_file_name, "w+");
+        CILK_ASSERT(NULL != w->l->record_replay_fptr);
 
         // Record the number of workers, file version in Worker 0's file
-        write_to_replay_log (g->workers[0], PED_TYPE_STR_WORKERS, NULL, g->P, PED_VERSION);
+        if (w->self == 0) {
+            write_to_replay_log (w, PED_TYPE_STR_WORKERS, NULL, g->P, PED_VERSION);
+        }
 #endif // RECORD_ON_REPLAY
     }
 
     // If we're recording, create the log files
     if (RECORD_LOG == g->record_or_replay)
     {
-        for(i = 0; i < g->total_workers; ++i)
-        {
-            __cilkrts_worker *w = g->workers[i];
-            cilk_snprintf_si(worker_file_name, sizeof(worker_file_name),
-                             "%s%d.cilklog", g->record_replay_file_name, w->self);
-            w->l->record_replay_fptr = fopen(worker_file_name, "w+");
-            CILK_ASSERT(NULL != w->l->record_replay_fptr);
-        }
+        cilk_snprintf_si(worker_file_name, sizeof(worker_file_name),
+                         "%s%d.cilklog", g->record_replay_file_name, w->self);
+        w->l->record_replay_fptr = fopen(worker_file_name, "w+");
+        CILK_ASSERT(NULL != w->l->record_replay_fptr);
 
         // Record the number of workers, file version in Worker 0's file
-        write_to_replay_log (g->workers[0], PED_TYPE_STR_WORKERS, NULL, g->P, PED_VERSION);
+        if (w->self == 0) {
+            write_to_replay_log(w, PED_TYPE_STR_WORKERS, NULL, g->P, PED_VERSION);
+        }
     }
 }
 

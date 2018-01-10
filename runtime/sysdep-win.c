@@ -218,8 +218,18 @@ void SetWorkerThreadName (__cilkrts_worker *w, void *fiber)
 NON_COMMON unsigned __CILKRTS_NOTHROW __stdcall
 scheduler_thread_proc_for_system_worker(void *arg)
 {
-    __cilkrts_worker *w = (__cilkrts_worker *) arg;
-    global_state_t *g = w->g;
+    /*int status;*/
+    worker_thread_arg_t* thread_arg = (struct worker_thread_arg*)arg;
+    global_state_t * g = thread_arg->g;
+    __cilkrts_worker *w = allocate_make_worker(g, thread_arg->self);
+
+    /* make_worker_systems */
+    w->l->type = WORKER_SYSTEM;
+    w->l->signal_node = signal_node_create();
+
+    /* publish itself */
+    g->workers[w->self] = w;
+
     __cilkrts_set_tls_worker(w);
 
     // Newly created threads inherit the process affinity mask.  Which should
@@ -558,7 +568,7 @@ void __cilkrts_start_workers(global_state_t *g, int n)
                 (HANDLE)_beginthreadex((void *)NULL,                // security attrib
                                        (unsigned)stack_size,        // stack size
                                        scheduler_thread_proc_for_system_worker,       // start proc
-                                       g->workers[i],               // start param
+                                       g->worker_thread_args[i],               // start param
                                        0,                           // creation flags
                                        &g->sysdep->nThreadIds[i]);  // receives thread ID
             if (0 == g->sysdep->hThreads[i])

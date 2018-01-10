@@ -916,19 +916,21 @@ static void random_steal(__cilkrts_worker *w)
     CILK_ASSERT(w->g->total_workers > 1);
 
     /* pick random *other* victim */
-    n = myrand(w) % (w->g->total_workers - 1);
-    if (n >= w->self)
-        ++n;
+    do {
+        n = myrand(w) % (w->g->total_workers - 1);
+        if (n >= w->self)
+            ++n;
 
-    // If we're replaying a log, override the victim.  -1 indicates that
-    // we've exhausted the list of things this worker stole when we recorded
-    // the log so just return.  If we're not replaying a log,
-    // replay_get_next_recorded_victim() just returns the victim ID passed in.
-    n = replay_get_next_recorded_victim(w, n);
-    if (-1 == n)
-        return;
+        // If we're replaying a log, override the victim.  -1 indicates that
+        // we've exhausted the list of things this worker stole when we recorded
+        // the log so just return.  If we're not replaying a log,
+        // replay_get_next_recorded_victim() just returns the victim ID passed in.
+        n = replay_get_next_recorded_victim(w, n);
+        if (-1 == n)
+            return;
 
-    victim = w->g->workers[n];
+        victim = w->g->workers[n];
+    } while (victim == NULL); /* when the rts is being initialized, other workers are not yet ready */
 
     START_INTERVAL(w, INTERVAL_FIBER_ALLOCATE) {
         /* Verify that we can get a stack.  If not, no need to continue. */
@@ -1728,12 +1730,16 @@ static void notify_children(__cilkrts_worker *w, unsigned int msg)
     // If worker is "n", then its children are 2n + 1, and 2n + 2.
     child_num = (w->self << 1) + 1;
     if (child_num < num_sys_workers) {
-        child = w->g->workers[child_num];
+        do {
+            child = w->g->workers[child_num];
+        } while (child == NULL); /* at the begining, busy waiting until the worker is initialized */
         CILK_ASSERT(child->l->signal_node);
         signal_node_msg(child->l->signal_node, msg);
         child_num++;
         if (child_num < num_sys_workers) {
-            child = w->g->workers[child_num];
+            do {
+                child = w->g->workers[child_num];
+            } while (child == NULL); /* at the begining, busy waiting until the worker is initialized */
             CILK_ASSERT(child->l->signal_node);
             signal_node_msg(child->l->signal_node, msg);
         }
@@ -2858,9 +2864,18 @@ __cilkrts_stack_frame *volatile *__cilkrts_disallow_stealing(
   Initialization and startup 
 *************************************************************/
 
-__cilkrts_worker *make_worker(global_state_t *g,
-                              int self, __cilkrts_worker *w)
+__cilkrts_worker *allocate_make_worker(global_state_t *g, int self)
 {
+
+    CILK_ASSERT(g->workers[self] == NULL);
+    struct CILK_ALIGNAS(256) buffered_worker {
+        __cilkrts_worker w;
+        char buf[64];
+    } *worker_mem = __cilkrts_malloc(sizeof(*worker_mem));
+
+    __cilkrts_worker * w = (__cilkrts_worker*)worker_mem;
+    __cilkrts_cilkscreen_ignore_block(worker_mem, worker_mem+1);
+
     w->self = self;
     w->g = g;
 
@@ -2938,7 +2953,9 @@ __cilkrts_worker *make_worker(global_state_t *g,
     
     __cilkrts_init_worker_sysdep(w);
 
-    reset_THE_exception(w); 
+    reset_THE_exception(w);
+
+    replay_init_worker(w, g);
 
     return w;
 }
@@ -3034,8 +3051,14 @@ void __cilkrts_deinit_internal(global_state_t *g)
     for (i = 0; i < g->total_workers; ++i)
         destroy_worker(g->workers[i]);
 
-    // Free memory for all worker blocks which were allocated contiguously
-    __cilkrts_free(g->workers[0]);
+    /* free the worker_thread_args allocated during initialization */
+    __cilkrts_free(g->worker_thread_args);
+
+    /* TODO: so far, we destroy and deallocate objects for workers one by one, not the optimal way.
+     * ideally, we should let each worker thread destroy/deallocate itself */
+    for (i=0; i< g->total_workers; i++) {
+        __cilkrts_free(g->workers[i]);
+    }
 
     __cilkrts_free(g->workers);
 
@@ -3140,55 +3163,6 @@ static enum schedule_t worker_runnable(__cilkrts_worker *w)
     return SCHEDULE_RUN;
 }
 
-
-
-// Initialize the worker structs, but don't start the workers themselves.
-static void init_workers(global_state_t *g)
-{
-    int total_workers = g->total_workers;
-    int i;
-    struct CILK_ALIGNAS(256) buffered_worker {
-        __cilkrts_worker w;
-        char buf[64];
-    } *workers_memory;
-
-    /* not needed if only one worker */
-    cilk_fiber_pool_init(&g->fiber_pool,
-                         NULL,
-                         g->stack_size,
-                         g->global_fiber_pool_size,           // buffer_size
-                         g->max_stacks,                       // maximum # to allocate
-                         1);
-
-    cilk_fiber_pool_set_fiber_limit(&g->fiber_pool,
-                                    (g->max_stacks ? g->max_stacks : INT_MAX));
-
-    g->workers = (__cilkrts_worker **)
-        __cilkrts_malloc(total_workers * sizeof(*g->workers));
-
-    // Allocate 1 block of memory for workers to make life easier for tools
-    // like Inspector which run multithreaded and need to know the memory
-    // range for all the workers that will be accessed in a user's program
-    workers_memory = (struct buffered_worker*)
-        __cilkrts_malloc(sizeof(*workers_memory) * total_workers);    
-    
-    // Notify any tools that care (Cilkscreen and Inspector) that they should
-    // ignore memory allocated for the workers
-    __cilkrts_cilkscreen_ignore_block(&workers_memory[0],
-                                      &workers_memory[total_workers]);
-
-    // Initialize worker structs, including unused worker slots.
-    for (i = 0; i < total_workers; ++i) {
-        g->workers[i] = make_worker(g, i, &workers_memory[i].w);
-    }
-
-    // Set the workers in the first P - 1 slots to be system workers.
-    // Remaining worker structs already have type == 0.
-    for (i = 0; i < g->system_workers; ++i) {
-        make_worker_system(g->workers[i]);
-    }
-}
-
 void __cilkrts_init_internal(int start)
 {
     global_state_t *g = NULL;
@@ -3217,12 +3191,38 @@ void __cilkrts_init_internal(int start)
             // Cilkview) then there's only one worker and we need to tell
             // the tool about the extent of the stack
             if (g->under_ptool)
-                __cilkrts_establish_c_stack();     
-            init_workers(g);
+                __cilkrts_establish_c_stack();
 
-            // Initialize per-work record/replay logging
-            replay_init_workers(g);
+            /* not needed if only one worker */
+            cilk_fiber_pool_init(&g->fiber_pool,
+                                 NULL,
+                                 g->stack_size,
+                                 g->global_fiber_pool_size,           // buffer_size
+                                 g->max_stacks,                       // maximum # to allocate
+                                 1);
 
+            cilk_fiber_pool_set_fiber_limit(&g->fiber_pool,
+                                            (g->max_stacks ? g->max_stacks : INT_MAX));
+
+            int total_workers = g->total_workers;
+            g->workers = (__cilkrts_worker **)
+                    __cilkrts_malloc(total_workers * sizeof(*g->workers));
+
+            g->worker_thread_args = (struct worker_thread_arg *)
+                    __cilkrts_malloc(total_workers * sizeof(struct worker_thread_arg));
+            // Notify any tools that care (Cilkscreen and Inspector) that they should
+            // ignore memory allocated for the workers
+            __cilkrts_cilkscreen_ignore_block(g->workers,
+                                              &g->workers[total_workers]);
+            __cilkrts_cilkscreen_ignore_block(g->worker_thread_args,
+                                              &g->worker_thread_args[total_workers]);
+            /* init the arguments to each worker thread for creating worker object */
+            int i;
+            for (i = 0; i < total_workers; ++i) {
+                g->worker_thread_args[i].g = g;
+                g->worker_thread_args[i].self = i;
+                g->workers[i] = NULL;
+            }
             // Initialize any system dependent global state
             __cilkrts_init_global_sysdep(g);
 

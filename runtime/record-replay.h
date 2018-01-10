@@ -224,9 +224,10 @@ int replay_get_next_recorded_victim(__cilkrts_worker *w, int id)
  * If we're replaying a log, this will read the logs into the per-worker
  * structures.
  *
+ * #param w the worker replay to be initialized
  * @param g Cilk runtime global state
  */
-void replay_init_workers(global_state_t *g);
+void replay_init_worker(__cilkrts_worker* w, global_state_t *g);
 
 /**
  * Record a record on a successful steal.  A noop if record/replay is
