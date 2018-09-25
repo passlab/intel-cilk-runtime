@@ -113,7 +113,7 @@ features.  GCC and Clang requires an explicit compiler option,
 For example,
 
 % gcc -fcilkplus -o foo.exe foo.c
-% clang -fcilkplus -o foo.exe foo.c 
+% clang -fcilkplus -o foo.exe foo.c
 
 Older GCC versions (e.g., 4.8 cilkplus branch) requires explicit linking
 of both the library and its dependencies (libpthread, libdl).
@@ -156,6 +156,8 @@ Thanks to Eric Olson for sharing his patch for Raspberry Pi* with us.
 
 Thanks to Rainer Orth for submitting patches for exception handling and
 enabling Cilk Plus on the SPARC* architecture.
+
+Thanks to N. Yazdani for submitting a patch for fixing a build issue.
 
 ------------------------
 Intel and Cilk are trademarks of Intel Corporation in the U.S. and/or
