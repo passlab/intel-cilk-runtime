@@ -112,8 +112,20 @@ COMMON_SYSDEP int __cilkrts_xchg(volatile int *ptr, int x)
  */
 #if defined(__INTEL_COMPILER) || defined(__clang__)
 #define __builtin_cpu_supports(feature) 1
+#elif defined(__has_builtin)
+#    if !__has_builtin(__builtin_cpu_supports)
+#define __builtin_cpu_supports(feature) 1
+#    endif
+#elif defined(__has_feature)
+#    if !__has_feature(__builtin_cpu_supports)
+#define __builtin_cpu_supports(feature) 1
+#    endif
 #endif
 
+/** This is a temp fix for a bug in gcc related to hidden symbol `__cpu_model'
+ * ... because of the use of __builtin_cpu_supports("sse2"). 
+ */ 
+#define __builtin_cpu_supports(feature) 1
 /*
  * Restore the floating point state that is stored in a stack frame at each
  * spawn.  This should be called each time a frame is resumed.
