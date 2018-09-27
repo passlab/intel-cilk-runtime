@@ -102,6 +102,10 @@
 #   include <vxCpuLib.h>  
 #endif
 
+#ifdef REX_CILKRTS_SUPPORT
+#include "rex_kmp.h"
+#endif
+
 struct global_sysdep_state
 {
     pthread_t *threads;    ///< Array of pthreads for system workers
@@ -173,11 +177,13 @@ static void internal_run_scheduler_with_exceptions(__cilkrts_worker *w)
  */
 NON_COMMON void* scheduler_thread_proc_for_system_worker(void *arg)
 {
+    worker_thread_arg_t* thread_arg;
+    global_state_t * g;
+    thread_arg = (struct worker_thread_arg*)arg;
+    g = thread_arg->g;
+
     /*int status;*/
-    __cilkrts_worker *w;
-    worker_thread_arg_t* thread_arg = (struct worker_thread_arg*)arg;
-    global_state_t * g = thread_arg->g;
-    w = allocate_make_worker(g, thread_arg->self);
+    __cilkrts_worker *w = allocate_make_worker(g, thread_arg->self);
 
     /* make_worker_systems */
     w->l->type = WORKER_SYSTEM;
@@ -240,6 +246,8 @@ NON_COMMON void* scheduler_thread_proc_for_system_worker(void *arg)
  *
  * This function is exported so Piersol's stack trace displays
  * reasonable information.
+ *
+ * @deprecated by REX
  */ 
 void* __cilkrts_worker_stub(void* arg)
 {
@@ -305,6 +313,7 @@ static void * create_threads_and_work (void * arg)
     return scheduler_thread_proc_for_system_worker(arg);
 }
 #endif
+
 void __cilkrts_start_workers(global_state_t *g, int n)
 {
     g->workers_running = 1;

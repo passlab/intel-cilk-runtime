@@ -288,6 +288,13 @@ endif()
 # set the compiler flag for REX_CILKRTS_SUPPORT
 if(${REX_CILKRTS_SUPPORT})
     list(APPEND cilk_flags -DREX_CILKRTS_SUPPORT=1)
+    include_directories(
+         ${CMAKE_CURRENT_SOURCE_DIR}/../rex/runtime
+    #    ${CMAKE_CURRENT_SOURCE_DIR}/../llvm-openmp/runtime/src
+    #    ${CMAKE_CURRENT_SOURCE_DIR}/../llvm-openmp/runtime/src/i18n
+    #    ${CMAKE_CURRENT_SOURCE_DIR}/../llvm-openmp/runtime/src/thirdparty/ittnotify
+    #    ${CMAKE_CURRENT_BINARY_DIR}/../llvm-openmp/runtime/src
+    )
 endif()
 
 # Override the default flags for Windows build.
@@ -342,6 +349,12 @@ else()
                           OUTPUT_NAME cilkrts
     )
     list(APPEND cilk_targets cilkrts_static)
+endif()
+
+# set the linker flag for REX_CILKRTS_SUPPORT
+if(${REX_CILKRTS_SUPPORT})
+    link_directories(${CMAKE_CURRENT_BINARY_DIR}/../)
+    target_link_libraries(cilkrts rex omp)
 endif()
 
 # Install headers and libraries
