@@ -564,6 +564,7 @@ void __cilkrts_start_workers(global_state_t *g, int n)
         // Start the requested number of worker threads
         for (i = 0; i < n; ++i)
         {
+            g->worker_thread_args[i].worker_created = 1;
             g->sysdep->hThreads[i] =
                 (HANDLE)_beginthreadex((void *)NULL,                // security attrib
                                        (unsigned)stack_size,        // stack size

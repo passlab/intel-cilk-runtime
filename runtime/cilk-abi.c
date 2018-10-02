@@ -373,13 +373,22 @@ static __cilkrts_worker *find_free_worker(global_state_t *g)
     // Scan the non-system workers looking for one which is free so we can
     // use it.
     for (i = g->P - 1; i < g->total_workers; ++i) {
-        w = g->workers[i];
-        if (w != NULL) { /* the worker thread may not yet publish its worker object */
-            CILK_ASSERT(WORKER_SYSTEM != w->l->type);
-            if (w->l->type == WORKER_FREE) {
-                w->l->type = WORKER_USER;
-                w->l->team = w;
-                return w;
+        if (!g->worker_thread_args[i].worker_created) {
+            w = allocate_make_worker(g, i);
+            w->l->type = WORKER_USER;
+            w->l->team = w;
+            /* publish myself to the global */
+            g->workers[i] = w;
+            return w;
+        } else {
+            w = g->workers[i];
+            if (w != NULL) { /* the worker thread may not yet publish its worker object */
+                CILK_ASSERT(WORKER_SYSTEM != w->l->type);
+                if (w->l->type == WORKER_FREE) {
+                    w->l->type = WORKER_USER;
+                    w->l->team = w;
+                    return w;
+                }
             }
         }
     }
