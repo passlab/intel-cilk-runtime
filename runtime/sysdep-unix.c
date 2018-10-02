@@ -167,8 +167,6 @@ static void internal_run_scheduler_with_exceptions(__cilkrts_worker *w)
     __cilkrts_run_scheduler_with_exceptions(w);
 }
 
-
-
 /*
  * scheduler_thread_proc_for_system_worker
  *
@@ -188,6 +186,7 @@ NON_COMMON void* scheduler_thread_proc_for_system_worker(void *arg)
     /* make_worker_systems */
     w->l->type = WORKER_SYSTEM;
     w->l->signal_node = signal_node_create();
+    __cilkrts_set_tls_worker(w);
 
     /* publish itself to the global*/
     g->workers[w->self] = w;
@@ -203,12 +202,10 @@ NON_COMMON void* scheduler_thread_proc_for_system_worker(void *arg)
     /* Worker startup is serialized
     status = pthread_mutex_lock(&__cilkrts_global_mutex);
     CILK_ASSERT(status == 0);*/
-    CILK_ASSERT(w->l->type == WORKER_SYSTEM);
+    //CILK_ASSERT(w->l->type == WORKER_SYSTEM);
     /*status = pthread_mutex_unlock(&__cilkrts_global_mutex);
     CILK_ASSERT(status == 0);*/
     
-    __cilkrts_set_tls_worker(w);
-
     START_INTERVAL(w, INTERVAL_IN_SCHEDULER);
     START_INTERVAL(w, INTERVAL_IN_RUNTIME);
     START_INTERVAL(w, INTERVAL_INIT_WORKER);

@@ -59,6 +59,7 @@
 #define INCLUDED_LOCAL_STATE_DOT_H
 
 #include <internal/abi.h>
+#include <cilk/cilk_api.h>
 #include "worker_mutex.h"
 #include "global_state.h"
 #include "record-replay.h"
@@ -350,6 +351,12 @@ struct local_state  /* COMMON_PORTABLE */
      * [local read/write]
      */
     statistics* stats;
+
+    /**
+     * state of the worker
+     */
+
+    __cilkrts_worker_state_t state;
 
     /**
      * Count indicates number of failures since last successful steal.  This is

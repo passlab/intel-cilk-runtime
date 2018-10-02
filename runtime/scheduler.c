@@ -2048,7 +2048,9 @@ static void worker_scheduler_init_function(__cilkrts_worker *w)
 
         // Runtime begins in a wait-state and is woken up by the first user
         // worker when the runtime is ready.
+        printf("worker %d enter wait state\n", w->self+1);
         signal_node_wait(w->l->signal_node);
+        printf("worker %d enter run state\n", w->self+1);
         // ...
         // Runtime is waking up.
         notify_children_run(w);
@@ -2084,13 +2086,16 @@ static void worker_scheduler_terminate_function(__cilkrts_worker *w)
  */
 static void worker_scheduler_function(__cilkrts_worker *w)
 {
+    w->l->state = __CILKRTS_WORKER_INITING__;
     START_INTERVAL(w, INTERVAL_INIT_WORKER);
     worker_scheduler_init_function(w);
     STOP_INTERVAL(w, INTERVAL_INIT_WORKER);
-    
-    // The main scheduling loop body.
+    w->l->state = __CILKRTS_WORKER_WORKING__;
 
-    while (!w->g->work_done) {    
+    int safe_guard = 0; /** a safe guard to make sure a worker only recycle itself when it knows there
+ *                       * is no work to do */
+    // The main scheduling loop body.
+    while (!w->g->work_done) {
         // Execute the "body" of the scheduling loop, and figure
         // out the fiber to jump to next.
         START_INTERVAL(w, INTERVAL_SCHED_LOOP);
@@ -2106,6 +2111,7 @@ static void worker_scheduler_function(__cilkrts_worker *w)
             // the runtime, and start working.
             STOP_INTERVAL(w, INTERVAL_IN_RUNTIME);
             START_INTERVAL(w, INTERVAL_WORKING);
+            safe_guard = 0;
             cilk_fiber_suspend_self_and_resume_other(w->l->scheduling_fiber,
                                                      fiber_to_resume);
             // Return here only when this (scheduling) fiber is
@@ -2114,6 +2120,19 @@ static void worker_scheduler_function(__cilkrts_worker *w)
             // We've already switched from WORKING to IN_RUNTIME in
             // the runtime code that handles the fiber switch.  Thus, at
             // this point we are IN_RUNTIME already.
+        }
+
+        if (w->l->state == __CILKRTS_WORKER_TOBE_REAPED__) {
+            safe_guard ++;
+            if (safe_guard == 10) {
+                global_os_mutex_lock();
+                w->g->workers[w->self] = NULL; /* make myself disappear */
+                global_state_t *g = cilkg_get_global_state();
+                g->P--;
+                w->l->type = WORKER_FREE;
+                global_os_mutex_unlock();
+                return; /* terminate the worker */
+            }
         }
     }
 
@@ -2866,8 +2885,6 @@ __cilkrts_stack_frame *volatile *__cilkrts_disallow_stealing(
 
 __cilkrts_worker *allocate_make_worker(global_state_t *g, int self)
 {
-
-    CILK_ASSERT(g->workers[self] == NULL);
     struct CILK_ALIGNAS(256) buffered_worker {
         __cilkrts_worker w;
         char buf[64];
@@ -3131,6 +3148,7 @@ static enum schedule_t worker_runnable(__cilkrts_worker *w)
 {
     global_state_t *g = w->g;
 
+    printf("worker: %d detected its REAPED state\n", w->self+1);
     /* If this worker has something to do, do it.
        Otherwise the work would be lost. */
     if (w->l->next_frame_ff)
@@ -3159,6 +3177,8 @@ static enum schedule_t worker_runnable(__cilkrts_worker *w)
         // trying to steal.
         return SCHEDULE_WAIT;
     }
+
+    if (w->l->state == __CILKRTS_WORKER_TOBE_REAPED__) return SCHEDULE_WAIT;
 
     return SCHEDULE_RUN;
 }
@@ -3994,6 +4014,37 @@ execute_reductions_for_sync(__cilkrts_worker *w,
     return w;
 }
 
+/**
+ * to free system worker threads
+ * @param num_threads num of workers to free
+ * @return the actural worker threads that are freed
+ */
+int __cilkrts_free_workers(int num_threads) {
+    int i;
+
+    global_state_t *g = cilkg_get_global_state();
+    int count = 0;
+    global_os_mutex_lock();
+    int nworkers = g->P;
+    if (num_threads < 0 && num_threads > nworkers) num_threads = nworkers - 1;
+
+    for (i=nworkers-1; i>=0; i--) {
+        __cilkrts_worker * w = g->workers[i];
+        if (w == NULL) continue;
+        if (w->l->next_frame_ff == NULL && WORKER_SYSTEM == w->l->type) { /* no work to do */
+            printf("worker %d to be reaped\n", w->self+1);
+            w->l->state = __CILKRTS_WORKER_TOBE_REAPED__;
+            notify_children_wait(w);
+//            signal_node_should_wait(w->l->signal_node); /* so it will exit the loop of searching work */
+            count ++;
+        }
+        if (count == num_threads) break;
+    }
+
+    global_os_mutex_unlock();
+
+    return count;
+}
 
 /*
   Local Variables: **
