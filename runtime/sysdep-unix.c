@@ -279,6 +279,7 @@ static void create_threads(global_state_t *g, int base, int top)
     // TBD(11/30/12): We want to insert code providing the option of
     // pinning system workers to cores.
     for (int i = base; i < top; i++) {
+        g->worker_thread_args[i].worker_created = 1;
         int status = pthread_create(&g->sysdep->threads[i],
                                     NULL,
                                     scheduler_thread_proc_for_system_worker,
@@ -322,6 +323,7 @@ void __cilkrts_start_workers(global_state_t *g, int n)
             int half_threads = (n+1)/2;
         
             // Create the first thread passing a different thread function, so that it creates threads itself
+            g->worker_thread_args[0].worker_created = 1;
             status = pthread_create(&g->sysdep->threads[0], NULL, create_threads_and_work, &g->worker_thread_args[0]);
 
             if (status != 0)
