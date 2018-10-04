@@ -253,6 +253,11 @@ struct __cilkrts_worker {
      */
     __cilkrts_pedigree   pedigree;    
 #endif  /* __CILKRTS_ABI_VERSION >= 1 */
+
+#ifdef REX_CILKRTS_SUPPORT
+    /** pointer to the top-level xthread object, as an obque object for cilkrts */
+    void * xthread;
+#endif
 };
 
 
