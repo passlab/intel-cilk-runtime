@@ -129,6 +129,7 @@ typedef struct __cilkrts_worker_sysdep_state
 typedef struct worker_thread_arg {
     global_state_t * g;
     int self;
+    int worker_created; /* a flag to indicate whether a worker object is created or not */
 } worker_thread_arg_t;
 
 /**
