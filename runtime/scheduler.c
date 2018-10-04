@@ -2122,9 +2122,11 @@ static void worker_scheduler_function(__cilkrts_worker *w)
 
         if (w->l->state == __CILKRTS_WORKER_TOBE_REAPED__) {
             safe_guard ++;
+            printf("Worker %d return by itself now\n", w->self);
             if (safe_guard == 10) {
                 global_os_mutex_lock();
                 w->g->workers[w->self] = NULL; /* make myself disappear */
+                destroy_worker(w);
                 global_state_t *g = cilkg_get_global_state();
                 g->P--;
                 w->l->type = WORKER_FREE;
@@ -3162,6 +3164,11 @@ static enum schedule_t worker_runnable(__cilkrts_worker *w)
     if (g->work_done)
         return SCHEDULE_EXIT;
 
+    if (w->l->state == __CILKRTS_WORKER_TOBE_REAPED__) {
+        //printf("worker: %d detected its REAPED state\n", w->self+1);
+        return SCHEDULE_WAIT;
+    }
+
     if (0 == w->self) {
         // This worker is the root node and is the only one that may query the
         // global state to see if there are still any user workers in Cilk.
@@ -3178,11 +3185,6 @@ static enum schedule_t worker_runnable(__cilkrts_worker *w)
                signal_node_should_wait(w->l->signal_node)) {
         // This worker has been notified by its parent that it should stop
         // trying to steal.
-        return SCHEDULE_WAIT;
-    }
-
-    if (w->l->state == __CILKRTS_WORKER_TOBE_REAPED__) {
-    	//printf("worker: %d detected its REAPED state\n", w->self+1);
         return SCHEDULE_WAIT;
     }
 
@@ -4042,11 +4044,11 @@ int __cilkrts_free_workers(int num_threads) {
         if (w->l->next_frame_ff == NULL && WORKER_SYSTEM == w->l->type) { /* no work to do */
             printf("worker %d to be reaped\n", w->self+1);
             w->l->state = __CILKRTS_WORKER_TOBE_REAPED__;
-            notify_children_wait(w);
+//            notify_children_wait(w);
 //            signal_node_should_wait(w->l->signal_node); /* so it will exit the loop of searching work */
             count ++;
+            if (count == num_threads) break;
         }
-        if (count == num_threads) break;
     }
 
     global_os_mutex_unlock();
