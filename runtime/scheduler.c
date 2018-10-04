@@ -2048,9 +2048,7 @@ static void worker_scheduler_init_function(__cilkrts_worker *w)
 
         // Runtime begins in a wait-state and is woken up by the first user
         // worker when the runtime is ready.
-        printf("worker %d enter wait state\n", w->self+1);
         signal_node_wait(w->l->signal_node);
-        printf("worker %d enter run state\n", w->self+1);
         // ...
         // Runtime is waking up.
         notify_children_run(w);
@@ -3149,7 +3147,6 @@ static enum schedule_t worker_runnable(__cilkrts_worker *w)
 {
     global_state_t *g = w->g;
 
-    printf("worker: %d detected its REAPED state\n", w->self+1);
     /* If this worker has something to do, do it.
        Otherwise the work would be lost. */
     if (w->l->next_frame_ff)
@@ -3179,7 +3176,10 @@ static enum schedule_t worker_runnable(__cilkrts_worker *w)
         return SCHEDULE_WAIT;
     }
 
-    if (w->l->state == __CILKRTS_WORKER_TOBE_REAPED__) return SCHEDULE_WAIT;
+    if (w->l->state == __CILKRTS_WORKER_TOBE_REAPED__) {
+    	//printf("worker: %d detected its REAPED state\n", w->self+1);
+        return SCHEDULE_WAIT;
+    }
 
     return SCHEDULE_RUN;
 }
