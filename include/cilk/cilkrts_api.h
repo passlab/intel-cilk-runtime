@@ -34,7 +34,7 @@
     sf->flags       = __CILKRTS_VERSION_FLAG;
     w->current_stack_frame = sf;
 
-    trace_printf("helper frame entered: %p by %p(W%d)\n", sf, w, w->self);
+    trace_printf("helper frame entered: %p by %p(W%d)\n", sf, w, w->self+1);
     sf->spawn_helper_pedigree.rank = w->pedigree.rank;
     sf->spawn_helper_pedigree.parent = w->pedigree.parent;
     sf->call_parent->spawn_helper_pedigree.rank = w->pedigree.rank;
@@ -49,7 +49,7 @@
      * or the second store is a release (st8.rel on Itanium)   */
     w->tail = tail;
     sf->flags |= CILK_FRAME_DETACHED;
-    trace_printf("frame detached: %p by %p(W%d)\n", parent_frame, w, w->self);
+    trace_printf("frame detached: %p by %p(W%d)\n", parent_frame, w, w->self+1);
 }
 
 /* This variable is used in __CILKRTS_FORCE_FRAME_PTR(), below */
@@ -88,7 +88,7 @@ static int __cilkrts_dummy = 8;
 #define CILKRTS_SPAWN_HELPER_EPILOG()                                   \
     __CILKRTS_POP_FRAME(__stack_frame__);                                         \
     __cilkrts_leave_frame(&__stack_frame__);              \
-    trace_printf("left frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self)
+    trace_printf("left frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self+1)
 
 /**
  * CILKRTS_FUNCTION_PROLOG/EPILOG are macros used by function that makes any cilk related calls. Each should
@@ -101,7 +101,7 @@ static int __cilkrts_dummy = 8;
     struct __cilkrts_stack_frame __stack_frame__;                   \
     __CILKRTS_FORCE_FRAME_PTR(__stack_frame__);                     \
     __cilkrts_enter_frame_1(&__stack_frame__);                    \
-    trace_printf("spawnning frame entered: %p by %p(w%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self)
+    trace_printf("spawnning frame entered: %p by %p(w%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self+1)
 
 /**
  * Must be called after the last invocation of CILKRTS_SPAWN, CILKRTS_SYNC, or other __cilkrts related runtime routine
@@ -110,7 +110,7 @@ static int __cilkrts_dummy = 8;
 #define CILKRTS_FUNCTION_EPILOG() do {                                      \
     __CILKRTS_POP_FRAME(__stack_frame__);                                 \
     if (__stack_frame__.flags != __CILKRTS_VERSION_FLAG)  {             \
-        trace_printf("to leave frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self);      \
+        trace_printf("to leave frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self+1);      \
         __cilkrts_leave_frame(&__stack_frame__);                       \
     } \
 } while (0)
@@ -127,7 +127,7 @@ static int __cilkrts_dummy = 8;
     if (__builtin_expect(! CILK_SETJMP(__stack_frame__.ctx), 1)) {        \
         helper_func(&__stack_frame__, __VA_ARGS__);                                                     \
     } else {                                                              \
-        trace_printf("continutation entry after being stolen by %p(W%d)\n", __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self); \
+        trace_printf("continutation entry after being stolen by %p(W%d)\n", __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self+1); \
     }                   \
 } while (0)
 
@@ -140,7 +140,7 @@ static int __cilkrts_dummy = 8;
     if (__builtin_expect(__stack_frame__.flags & CILK_FRAME_UNSYNCHED, 0)) {                           \
         __CILKRTS_SAVE_FP(__stack_frame__);            \
         if (CILK_SETJMP(__stack_frame__.ctx) == 0)   {         \
-            trace_printf("to sync frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self);        \
+            trace_printf("to sync frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self+1);        \
             __cilkrts_sync(&__stack_frame__);                       \
         } \
     }                                                               \
