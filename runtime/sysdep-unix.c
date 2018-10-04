@@ -185,7 +185,8 @@ NON_COMMON void* scheduler_thread_proc_for_system_worker(void *arg)
 
     /* make_worker_systems */
     w->l->type = WORKER_SYSTEM;
-    w->l->signal_node = signal_node_create();
+    /* pass the signal node to the worker */
+    w->l->signal_node = thread_arg->signal_node;
     __cilkrts_set_tls_worker(w);
 
     /* publish itself to the global*/

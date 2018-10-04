@@ -63,6 +63,7 @@
 #include "stats.h"
 #include "bug.h"
 #include "cilk_fiber.h"
+#include "signal_node.h"
 
 __CILKRTS_BEGIN_EXTERN_C
 
@@ -79,6 +80,22 @@ enum record_replay_t {
     RECORD_LOG,
     REPLAY_LOG
 };
+
+/**
+ * we use this as object to pass to the worker thread starting routine, e.g.
+ * args to the thread func of pthread_create.
+ *
+ * This is used by global initialization so we will leave to each worker itself to allocate
+ * its __cilkrts_worker objects and other related for better performance coming from both
+ * locality and parallelism
+ */
+typedef struct worker_thread_arg {
+    global_state_t * g;
+    int self;
+    int worker_created; /* a flag to indicate whether a worker object is created or not */
+    signal_node_t *signal_node;
+    /* for the worker to receive the signal even before the worker is created */
+} worker_thread_arg_t;
 
 /**
  * @brief Global state structure version.

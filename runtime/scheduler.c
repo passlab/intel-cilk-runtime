@@ -3094,8 +3094,13 @@ static void wake_runtime(global_state_t *g)
     if (g->P > 1) {
         // Send a message to the root node.  The message will propagate.
         root = g->workers[0];
-        CILK_ASSERT(root->l->signal_node);
-        signal_node_msg(root->l->signal_node, 1);
+        if (root != NULL) { /* because of perworker init, the worker object may not yet set */
+            CILK_ASSERT(root->l->signal_node);
+            signal_node_msg(root->l->signal_node, 1);
+        } else { /* we will use the worker_thread_args object from which a worker will
+                  * receive the signal_node object from it eventually */
+            signal_node_msg(g->worker_thread_args[0].signal_node, 1);
+        }
     }
 }
 
@@ -3243,6 +3248,7 @@ void __cilkrts_init_internal(int start)
                 g->worker_thread_args[i].g = g;
                 g->worker_thread_args[i].self = i;
                 g->worker_thread_args[i].worker_created = 0;
+                g->worker_thread_args[i].signal_node = signal_node_create();
                 g->workers[i] = NULL;
             }
             // Initialize any system dependent global state

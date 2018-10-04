@@ -117,21 +117,6 @@ typedef struct cilkred_map           cilkred_map;     ///< Forward declaration f
 /// Forwarded declaration for system-dependent worker state
 typedef struct __cilkrts_worker_sysdep_state
                                      __cilkrts_worker_sysdep_state;
-
-/**
- * we use this as object to pass to the worker thread starting routine, e.g.
- * args to the thread func of pthread_create.
- *
- * This is used by global initialization so we will leave to each worker itself to allocate
- * its __cilkrts_worker objects and other related for better performance coming from both
- * locality and parallelism
- */
-typedef struct worker_thread_arg {
-    global_state_t * g;
-    int self;
-    int worker_created; /* a flag to indicate whether a worker object is created or not */
-} worker_thread_arg_t;
-
 /**
  * The worker struct contains per-worker information that needs to be
  * visible to the compiler, or rooted here.
