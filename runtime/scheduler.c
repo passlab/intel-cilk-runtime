@@ -3061,6 +3061,7 @@ void __cilkrts_deinit_internal(global_state_t *g)
     }
 
     __cilkrts_free(g->workers);
+    __cilkrts_free(g->worker_thread_args);
 
     cilk_fiber_pool_destroy(&g->fiber_pool);
     __cilkrts_frame_malloc_global_cleanup(g);
@@ -3221,6 +3222,7 @@ void __cilkrts_init_internal(int start)
             for (i = 0; i < total_workers; ++i) {
                 g->worker_thread_args[i].g = g;
                 g->worker_thread_args[i].self = i;
+                g->worker_thread_args[i].worker_created = 0;
                 g->workers[i] = NULL;
             }
             // Initialize any system dependent global state
