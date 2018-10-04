@@ -89,7 +89,6 @@ static int __cilkrts_dummy = 8;
     __CILKRTS_POP_FRAME(__stack_frame__);                                         \
     __cilkrts_leave_frame(&__stack_frame__);              \
     trace_printf("left frame: %p by %p(W%d)\n", &__stack_frame__, __cilkrts_get_tls_worker(), __cilkrts_get_tls_worker()->self+1)
-
 /**
  * CILKRTS_FUNCTION_PROLOG/EPILOG are macros used by function that makes any cilk related calls. Each should
  * be invoked only once in each function's invocation. 

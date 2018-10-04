@@ -213,6 +213,27 @@ CILK_API(int) __cilkrts_get_total_workers(void);
  */
 CILK_API(int) __cilkrts_get_worker_number(void);
 
+typedef enum __cilkrts_worker_state {
+    __CILKRTS_WORKER_INITING__,   /* idle in the runtime looking for work */
+    __CILKRTS_WORKER_IDLING__,   /* idle in the runtime looking for work */
+    __CILKRTS_WORKER_WORKING__,  /* in user code doing some work */
+    __CILKRTS_WORKER_TOBE_REAPED__, /* no work to do, and set by the user worker
+                                     * that this should be recycled when the worker knows this state */
+    __CILKRTS_WORKER_KILLED__, /* native thread is not existing anymore for this worker */
+} __cilkrts_worker_state_t;
+
+/**
+ * Return the worker state, it returns when the method is being called
+ * @return
+ */
+CILK_ABI(int) __cilkrts_get_worker_state(int);
+
+/**
+ * free provided number of workers from the cilkrts
+ * @return
+ */
+CILK_ABI(int) __cilkrts_free_workers(int);
+
 /** Tests whether "force reduce" behavior is enabled.
  *
  *  @return Non-zero if force-reduce mode is on, zero if it is off.

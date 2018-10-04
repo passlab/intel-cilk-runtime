@@ -383,9 +383,11 @@ int cilkg_set_param_w(const wchar_t* param, const wchar_t* value);
 static inline
 int cilkg_get_nworkers(void)
 {
+    global_state_t *g = cilkg_get_global_state();
+    return g->P;
     // "private" extern declaration
-    extern global_state_t* cilkg_get_user_settable_values(void);
-    return cilkg_get_user_settable_values()->P;
+//    extern global_state_t* cilkg_get_user_settable_values(void);
+//    return cilkg_get_user_settable_values()->P;
 }
 
 /**
@@ -394,12 +396,16 @@ int cilkg_get_nworkers(void)
 static inline
 int cilkg_get_total_workers(void)
 {
+    global_state_t *g = cilkg_get_global_state();
+    return g->total_workers;
+/*
     // "private" extern declaration
     extern int cilkg_calc_total_workers(void);
 
     // This number can fluctate until initialization so we
     // compute it from scratch
     return cilkg_calc_total_workers();
+*/
 }
 
 /**
